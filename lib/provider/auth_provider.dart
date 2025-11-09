@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:dio/dio.dart';
+import 'dart:convert';
 
 class AuthProvider with ChangeNotifier {
   String? _token;
@@ -23,10 +24,11 @@ class AuthProvider with ChangeNotifier {
       );
 
       _token = response.data['token'];
-      _user = response.data['usuario'];
+      _user = Map<String, dynamic>.from(response.data['usuario']);
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', _token!);
+      await prefs.setString('usuario', jsonEncode(_user));
 
       notifyListeners();
       return true;
@@ -41,13 +43,18 @@ class AuthProvider with ChangeNotifier {
     _user = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
+    await prefs.remove('usuario');
     notifyListeners();
   }
 
   Future<void> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey('token')) return;
+
     _token = prefs.getString('token');
+    if (prefs.containsKey('usuario')) {
+      _user = jsonDecode(prefs.getString('usuario')!);
+    }
     notifyListeners();
   }
 }
