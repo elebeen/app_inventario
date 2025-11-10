@@ -5,7 +5,7 @@ import 'inventory_screen.dart';
 class UpdateStockScreen extends StatelessWidget {
   final int index;
 
-  const UpdateStockScreen({Key? key, required this.index}) : super(key: key);
+  const UpdateStockScreen({super.key, required this.index});
 
   @override
   Widget build(BuildContext context) {

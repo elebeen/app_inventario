@@ -113,7 +113,7 @@ class _NewProductAdminScreenState extends State<NewProductAdminScreen> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: categoriaSeleccionada,
+                      initialValue: categoriaSeleccionada,
                       items: categorias
                           .map((cat) => DropdownMenuItem(
                                 value: cat,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ProductDetailScreen extends StatelessWidget {
   final String codigo;
   // En una app real obtendrías aquí el producto desde la nube por el código
-  const ProductDetailScreen({Key? key, required this.codigo}) : super(key: key);
+  const ProductDetailScreen({super.key, required this.codigo});
 
   // Simulamos un producto retornado
   Map<String, String> fakeProducto(String codigo) {
@@ -67,8 +67,8 @@ class ProductDetailScreen extends StatelessWidget {
                       SnackBar(content: Text('Eliminar pendiente')),
                     );
                   },
-                  child: Text('Eliminar'),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  child: Text('Eliminar'),
                 ),
               ],
             ),

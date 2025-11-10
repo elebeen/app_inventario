@@ -85,7 +85,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
 
               // Dropdown de categorías (solo selección)
               DropdownButtonFormField<String>(
-                value: categoriaSeleccionada,
+                initialValue: categoriaSeleccionada,
                 items: categorias
                     .map((cat) => DropdownMenuItem(
                           value: cat,

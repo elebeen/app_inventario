@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../data/inventory_data.dart';
 
 class InventoryScreen extends StatelessWidget {
-  const InventoryScreen({Key? key}) : super(key: key);
+  const InventoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

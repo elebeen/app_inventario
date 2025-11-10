@@ -5,13 +5,13 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.4.0  # ✅ recomendado, ya que Flutter estable actual trabaja con 3.4.x
+  sdk: ^3.4.0 
 
 dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  mobile_scanner: ^7.1.3  # ✅ escáner que sí funciona sin conflictos
+  mobile_scanner: ^7.1.3 
   provider: ^6.1.0
   shared_preferences: ^2.2.0
   dio: ^5.9.0

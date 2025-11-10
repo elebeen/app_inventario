@@ -57,7 +57,7 @@ class AdminScreen extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => StockScreen()),
                 );
               },
-              child: const Text("Stock"),
+              child: const Text("Productos"),
             ),
           ],
         ),
