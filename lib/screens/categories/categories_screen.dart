@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import '../../data/inventory_data.dart';
 import 'create_category_screen.dart';
 
-class CategoriesScreen extends StatefulWidget {
-  const CategoriesScreen({super.key});
+class CategoryScreen extends StatefulWidget {
+  const CategoryScreen({super.key});
 
   @override
-  State<CategoriesScreen> createState() => _CategoriesScreenState();
+  State<CategoryScreen> createState() => _CategoryScreenState();
 }
 
-class _CategoriesScreenState extends State<CategoriesScreen> {
+class _CategoryScreenState extends State<CategoryScreen> {
   // Abrir pantalla para crear nueva categoría
   void crearCategoria() async {
     final nuevaCategoria = await Navigator.push(

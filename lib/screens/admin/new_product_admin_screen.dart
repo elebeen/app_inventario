@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../data/inventory_data.dart';
-import 'inventory_screen.dart';
-import 'create_category_screen.dart';
+import '../products/products_screen.dart';
+import '../categories/create_category_screen.dart';
 
 class NewProductAdminScreen extends StatefulWidget {
   final String codigo;
@@ -47,7 +47,7 @@ class _NewProductAdminScreenState extends State<NewProductAdminScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const InventoryScreen()),
+        MaterialPageRoute(builder: (_) => const ProductScreen()),
       );
     }
   }

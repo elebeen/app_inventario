@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../employee/employee_home_screen.dart';
-import '../admin/select_store_screen.dart';
+import 'select_store_screen.dart';
 import '../employee/scan_screen.dart';
 import '../auth/login_screen.dart';
 

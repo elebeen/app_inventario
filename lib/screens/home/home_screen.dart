@@ -1,75 +1,67 @@
 import 'package:flutter/material.dart';
-import '../admin/select_store_screen.dart'; // <-- nueva pantalla
-import '../employee/employee_home_screen.dart';
-import '../employee/scan_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:registro_productos/screens/categories/categories_screen.dart';
+import 'package:registro_productos/screens/products/products_screen.dart';
+import 'package:registro_productos/screens/settings/settings.dart';
+import 'package:registro_productos/screens/users/users_screen.dart';
+import 'package:registro_productos/provider/auth_provider.dart';
+import 'package:registro_productos/components/app_bar.dart';
+import 'package:registro_productos/components/bottom_bar.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+
+  static const List<String> _pageTitles = [
+    'Productos',
+    'Categorías',
+    'Usuarios',
+    'Configuración',
+  ];
+
+  static const List<Widget> _pages = <Widget>[
+    ProductScreen(), // 0. Productos (Usando tu InventoryScreen)
+    CategoryScreen(), // 1. Categorías
+    UserScreen(), // 2. Usuarios
+    SettingScreen(), // 3. Settings (Pantalla de ejemplo abajo)
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() => _currentIndex = index);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Bienvenido")),
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.store, size: 120, color: Colors.indigo),
-                const SizedBox(height: 40),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.admin_panel_settings),
-                  label: const Text("Administrador"),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50),
-                    backgroundColor: Colors.orange,
-                  ),
-                  onPressed: () {
-                    // Antes iba directo a AdminScreen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const SelectStoreScreen(),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.person),
-                  label: const Text("Empleado"),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50),
-                    backgroundColor: Colors.green,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const EmployeeHomeScreen()),
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: const Text("Escanear Producto"),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const ScanScreen()),
-                    );
-                  },
-                ),
-              ],
-            ),
+      appBar: CustomAppBar(
+        title: _pageTitles[_currentIndex],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              auth.logout();
+            },
           ),
-        ),
+        ],
+      ),
+      body: _pages.elementAt(_currentIndex),
+      bottomNavigationBar: CustomBottomBar(
+        currentIndex: _currentIndex,
+        onTap: _onItemTapped,
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blueAccent,
+        child: const Icon(Icons.add),
+        // Agregar un nuevo producto
+        onPressed: () {},
       ),
     );
   }

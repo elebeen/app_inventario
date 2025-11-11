@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'scan_screen.dart';
-import '../admin/inventory_screen.dart';
+import '../products/products_screen.dart';
 import '../admin/update_stock_list_screen.dart'; // Nuevo archivo para actualizar stock
 
 class EmployeeHomeScreen extends StatelessWidget {
@@ -44,7 +44,7 @@ class EmployeeHomeScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const InventoryScreen()),
+                    MaterialPageRoute(builder: (_) => const ProductScreen()),
                   );
                 },
               ),

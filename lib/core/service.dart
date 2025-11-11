@@ -1,9 +1,8 @@
-// import 'package:get_it/get_it.dart';
-// import 'package:dio/dio.dart';
-// import 'dio_client.dart';
+import 'package:get_it/get_it.dart';
+import 'dio_client.dart';
 
-// final locator = GetIt.instance;
+final getIt = GetIt.instance;
 
-// void setUpLocator() {
-//   locator.registerLazySingleton<Dio>(() => DioClient.createDio());
-// }
+void setupServiceLocator() {
+  getIt.registerSingleton<ApiService>(ApiService(getIt()));
+}

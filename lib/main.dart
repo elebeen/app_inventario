@@ -1,26 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:registro_productos/screens/home/home_screen.dart';
 import 'screens/auth/login_screen.dart';
-import 'screens/admin/select_store_screen.dart';
-import 'screens/employee/employee_home_screen.dart';
 import 'provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await dotenv.load(fileName: ".env");
 
-  final auth = AuthProvider();
-  await auth.tryAutoLogin();
-
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider())
-      ],
-      child: const MyApp()
-    )
+    ChangeNotifierProvider(
+      create: (_) => AuthProvider()..tryAutoLogin(),
+      child: const MyApp(),
+    ),
   );
 }
 
@@ -29,19 +22,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<AuthProvider>(context);
-
+    final auth = context.watch<AuthProvider>(); // re-render cuando cambie
     return MaterialApp(
-      title: 'Gestión de Productos',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.indigo),
-      // home: const LoginScreen(),
-      home: auth.isAuthenticated
-         ? const EmployeeHomeScreen() 
-         : const LoginScreen(),
+      title: 'Mi App',
+      home: auth.isAuthenticated ? const HomeScreen() : const LoginScreen(),
       routes: {
-        '/home': (context) => const EmployeeHomeScreen(),
-        '/admin_store': (context) => const SelectStoreScreen(),
+        '/login': (_) => const LoginScreen(),
+        '/home': (_) => const HomeScreen(),
       },
     );
   }

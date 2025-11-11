@@ -1,5 +1,4 @@
 import 'dart:nativewrappers/_internal/vm/lib/ffi_native_type_patch.dart';
-
 import 'package:dio/dio.dart';
 import 'package:registro_productos/data/models/product_model.dart';
 

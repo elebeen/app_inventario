@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'scan_screen_admin.dart';
-import 'users_screen.dart';
-import 'categories_screen.dart';
+import '../users/users_screen.dart';
+import '../categories/categories_screen.dart';
 import 'stock_screen.dart';
 
 class AdminScreen extends StatelessWidget {
@@ -34,7 +34,7 @@ class AdminScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => UsersScreen()),
+                  MaterialPageRoute(builder: (context) => UserScreen()),
                 );
               },
               child: const Text("Usuarios"),
@@ -44,7 +44,7 @@ class AdminScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CategoriesScreen()),
+                  MaterialPageRoute(builder: (context) => CategoryScreen()),
                 );
               },
               child: const Text("Categorías"),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/inventory_data.dart';
-import 'inventory_screen.dart';
+import '../products/products_screen.dart';
 
 class UpdateStockScreen extends StatelessWidget {
   final int index;
@@ -68,7 +68,7 @@ class UpdateStockScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const InventoryScreen()),
+                              builder: (_) => const ProductScreen()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
