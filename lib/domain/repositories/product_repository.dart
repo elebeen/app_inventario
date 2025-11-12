@@ -1,36 +1,35 @@
-import 'dart:nativewrappers/_internal/vm/lib/ffi_native_type_patch.dart';
-import 'package:dio/dio.dart';
+import 'package:registro_productos/core/dio_client.dart';
 import 'package:registro_productos/data/models/product_model.dart';
 
 abstract class ProductRepository {
   Future<List<Product>> fetchProducts();
-  Future<Product> fetchProduct(String id);
-  Future<Product> createProduct(String codigoBarras, String nombre, Float precio, Int32 stock, String categoria);
-  Future<Product> updateProduct(String id, String nombre, Float precio, Int32 stock, String categoria);
-  Future<Product> updateStock(String id, Int32 stock);
-  Future<void> deleteProduct(String id);
+  Future<Product> fetchProduct(int id);
+  Future<Product> createProduct(String codigoBarras, String nombre, double precio, int stock, String categoria);
+  Future<Product> updateProduct(int id, String nombre, double precio, int stock, String categoria);
+  Future<Product> updateStock(int id, int stock);
+  Future<void> deleteProduct(int id);
 }
 
 class ProductRepositoryImpl implements ProductRepository {
-  final Dio _dio;
+  final ApiService _api;
 
-  ProductRepositoryImpl(this._dio);
+  ProductRepositoryImpl(this._api);
   
   @override
   Future<List<Product>> fetchProducts() async {
-    final response = await _dio.get('/productos/');
+    final response = await _api.get('/productos');
     return (response.data as List).map((e) => Product.fromJson(e)).toList();
   }
 
   @override
-  Future<Product> fetchProduct(String id) async {
-    final response = await _dio.get('/productos/$id');
+  Future<Product> fetchProduct(int id) async {
+    final response = await _api.get('/productos/$id');
     return Product.fromJson(response.data);
   }
   
   @override
-  Future<Product> createProduct(String codigoBarras, String nombre, Float precio, Int32 stock, String categoria) async {
-    final response = await _dio.post('/productos/crear', data: {
+  Future<Product> createProduct(String codigoBarras, String nombre, double precio, int stock, String categoria) async {
+    final response = await _api.post('/productos/crear', {
       'codigo_barras': codigoBarras,
       'nombre': nombre,
       'precio':precio ,
@@ -41,8 +40,8 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
-  Future<Product> updateProduct(String id, String nombre, Float precio, Int32 stock, String categoria) async {
-    final response = await _dio.put('/productos/$id', data: {
+  Future<Product> updateProduct(int id, String nombre, double precio, int stock, String categoria) async {
+    final response = await _api.put('/productos/$id', {
       'nombre': nombre,
       'precio': precio,
       'stock': stock,
@@ -52,16 +51,16 @@ class ProductRepositoryImpl implements ProductRepository {
   }
   
   @override
-  Future<Product> updateStock(String id, Int32 stock) async {
-    final response = await _dio.put('/productos/$id', data: {
+  Future<Product> updateStock(int id, int stock) async {
+    final response = await _api.put('/productos/$id', {
       'cantidad': stock,
     });
     return Product.fromJson(response.data);
   }
 
   @override
-  Future<void> deleteProduct(String id) async {
-    final response = await _dio.delete('/productos/$id');
+  Future<void> deleteProduct(int id) async {
+    final response = await _api.delete('/productos/$id');
     return response.data;
   }
 }

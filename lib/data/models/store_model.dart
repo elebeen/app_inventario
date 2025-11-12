@@ -3,7 +3,7 @@ import 'package:registro_productos/data/models/product_model.dart';
 import 'package:registro_productos/data/models/user_model.dart';
 
 class Store {
-  String? id;
+  int? id;
   String? nombre;
   List<Product>? product;
   List<Category>? category;

@@ -1,23 +1,46 @@
 import 'package:registro_productos/data/models/category_model.dart';
 
 class Product {
-  String? codigo_barras;
+  int? id;
+  String? codigoBarras;
   String? nombre;
-  String? precio;
-  String? stock;
-  Category? categoriaId;
+  double? precio;
+  int? stock;
+  Category? categoria;
 
-  Product({this.codigo_barras, this.nombre, this.precio, this.stock, this.categoriaId});
+  Product({
+    this.id,
+    this.codigoBarras, 
+    this.nombre, 
+    this.precio, 
+    this.stock, 
+    this.categoria
+  });
 
   factory Product.fromJson(Map<String, dynamic> json) {
+    
+    Category? parsedCategory;
+    final categoryData = json['categoria']; 
+
+    if (categoryData != null && categoryData is Map<String, dynamic>) {
+      // 2. Parsea el objeto 'categoria'
+      parsedCategory = Category.fromJson(categoryData);
+    } else {
+      // Como plan B, si 'categoria' no viniera, usamos el ID.
+      if (json['categoriaId'] != null) {
+          parsedCategory = Category(id: json['categoriaId'], name: null);
+      } else {
+          parsedCategory = null;
+      }
+    }
+
     return Product(
-      codigo_barras: json['codigoBarras'],
+      codigoBarras: json['codigo_barras'],
       nombre: json['nombre'],
-      precio: json['precio'],
+      precio: double.parse(json['precio']),
       stock: json['stock'],
-      categoriaId: json['categoriaId'] != null 
-          ? Category.fromJson(json['categoriaId'] as Map<String, dynamic>)
-          : null,
+      // Asignamos la categoría que procesamos
+      categoria: parsedCategory,
     );
   }
 }

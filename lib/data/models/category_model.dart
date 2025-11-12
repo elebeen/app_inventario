@@ -2,7 +2,7 @@ import 'package:registro_productos/data/models/product_model.dart';
 
 // para la relacion muchos a muchos y obtener los productos de una categoría
 class CategoryWithProduct {
-  String? id;
+  int? id;
   String? name;
   List<Product>? product;
 
@@ -11,8 +11,8 @@ class CategoryWithProduct {
   factory CategoryWithProduct.fromJson(Map<String, dynamic> json) {
     return CategoryWithProduct(
       id: json['id'],
-      name: json['name'],
-      product: (json['product'] as List<dynamic>?)
+      name: json['nombre'],
+      product: (json['producto'] as List<dynamic>?)
         ?.map((e) => Product.fromJson(e as Map<String, dynamic>))
         .toList(),
     );
@@ -21,7 +21,7 @@ class CategoryWithProduct {
 
 // para solo obtener las categorías sin productos
 class Category {
-  String? id;
+  int? id;
   String? name;
 
   Category({this.id, this.name});
@@ -29,7 +29,7 @@ class Category {
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
       id: json['id'],
-      name: json['name'],
+      name: json['nombre'],
     );
   }
 }

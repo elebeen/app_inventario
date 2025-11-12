@@ -30,7 +30,16 @@ class ApiService {
   }
 
   Future<Response> get(String path, {Map<String, dynamic>? params}) async {
-    return await _dio.get(path, queryParameters: params);
+    // return await _dio.get(path, queryParameters: params);
+    try {
+      return await _dio.get(path, queryParameters: params);
+    } catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: path),
+        data: {'error': e.toString()},
+        statusCode: 500,
+      );
+    }
   }
 
   Future<Response> post(String path, Map<String, dynamic> data) async {
