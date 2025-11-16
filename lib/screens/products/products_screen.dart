@@ -38,13 +38,13 @@ class _ProductScreenState extends State<ProductScreen> {
       return Center(child: Text("Error: ${productProvider.errorMessage}"));
     }
 
-    if (productProvider.products.isEmpty) {
+    if (productProvider.products.content.isEmpty) {
       return const Center(child: Text("No se encontraron productos."));
     }
 
     // Pasamos la lista de productos del provider a tu widget de lista
     // (Asumiendo que tienes un widget ProductList como en tu código comentado)
-    return ProductList(productProvider.products);
+    return ProductList(productProvider.products.content);
   }
 }
 

@@ -15,11 +15,11 @@ class CustomBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
-    final role = auth.user != null && auth.user!['role'] != null
-        ? auth.user!['role'].toString()
-        : null;
-    final isAdmin = role == 'admin';
+    final roles = auth.user?['roles'] ?? [];
 
+    final isAdmin = roles.contains('admin_tienda') ||
+        roles.contains('admin_tienda_secundario');
+        
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,

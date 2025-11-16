@@ -1,22 +1,30 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:registro_productos/domain/repositories/product_repository.dart';
 import 'package:registro_productos/data/models/product_model.dart';
 
-class ProductProvider with ChangeNotifier {
-  final ProductRepository _productRepository;
+class ProductProvider extends ChangeNotifier {
+  final ProductRepositoryImpl _productRepository;
 
   ProductProvider(this._productRepository);
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  List<Product> _products = [];
-  List<Product> get products => _products;
-
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  // Lógica de negocio para obtener productos
+  PaginatedProductsResponse _products = PaginatedProductsResponse(
+    content: [],
+    page: 1,
+    size: 10,
+    totalElements: 0,
+    totalPages: 0,
+    hasNext: false,
+    hasPrevious: false,
+  );
+  
+  PaginatedProductsResponse get products => _products;
+
   Future<void> fetchProducts() async {
     _isLoading = true;
     _errorMessage = null;
@@ -25,8 +33,7 @@ class ProductProvider with ChangeNotifier {
     try {
       _products = await _productRepository.fetchProducts();
     } catch (e) {
-      _errorMessage = e.toString()+ "del provider";
-      print(e.toString()); // Manejar mejor el error en una app real
+      _errorMessage = e.toString();
     }
 
     _isLoading = false;

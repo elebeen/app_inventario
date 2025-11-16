@@ -2,7 +2,7 @@ import 'package:registro_productos/core/dio_client.dart';
 import 'package:registro_productos/data/models/product_model.dart';
 
 abstract class ProductRepository {
-  Future<List<Product>> fetchProducts();
+  Future<PaginatedProductsResponse> fetchProducts();
   Future<Product> fetchProduct(int id);
   Future<Product> createProduct(String codigoBarras, String nombre, double precio, int stock, String categoria);
   Future<Product> updateProduct(int id, String nombre, double precio, int stock, String categoria);
@@ -16,9 +16,14 @@ class ProductRepositoryImpl implements ProductRepository {
   ProductRepositoryImpl(this._api);
   
   @override
-  Future<List<Product>> fetchProducts() async {
-    final response = await _api.get('/productos');
-    return (response.data as List).map((e) => Product.fromJson(e)).toList();
+  Future<PaginatedProductsResponse> fetchProducts({ int page = 1, int size = 10 }) async {
+    final response = await _api.get('/productos', 
+      params: {
+        'page': page, 
+        'size': size
+      }
+    );
+    return PaginatedProductsResponse.fromJson(response.data);
   }
 
   @override
@@ -29,7 +34,7 @@ class ProductRepositoryImpl implements ProductRepository {
   
   @override
   Future<Product> createProduct(String codigoBarras, String nombre, double precio, int stock, String categoria) async {
-    final response = await _api.post('/productos/crear', {
+    final response = await _api.post('/productos/', {
       'codigo_barras': codigoBarras,
       'nombre': nombre,
       'precio':precio ,

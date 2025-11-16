@@ -16,31 +16,31 @@ class CategoryRepositoryImpl implements CategoryRepository {
   
   @override
   Future<List<Category>> getCategories() async {
-    final response = await _dio.get('/categorias/obtener');
+    final response = await _dio.get('/categorias/');
     return (response.data as List).map((e) => Category.fromJson(e)).toList();
   }
   
   @override
   Future<CategoryWithProduct> getCategory(String id) async {
-    final response = await _dio.get('/categorias/obtener/$id');
+    final response = await _dio.get('/categorias//$id');
     return CategoryWithProduct.fromJson(response.data);
   }
 
   @override
   Future<void> createCategory(String category) async {
-    final response = await _dio.post('/categorias/crear', data: {'nombre': category});
+    final response = await _dio.post('/categorias/', data: {'nombre': category});
     return response.data;
   }
   
   @override
   Future<void> updateCategory(String id, String category) async {
-    final response = await _dio.put('/categorias/actualizar/$id', data: {'nombre': category});
+    final response = await _dio.put('/categorias/$id', data: {'nombre': category});
     return response.data;
   }
 
   @override
   Future<void> deleteCategory(String id) async {
-    final response = await _dio.delete('/categorias/eliminar/$id');
+    final response = await _dio.delete('/categorias/$id');
     return response.data;
   }
 }

@@ -33,3 +33,37 @@ class Category {
     );
   }
 }
+
+class PaginatedCategoryResponse {
+  final List<CategoryWithProduct> categories;
+  final int page;
+  final int size;
+  final int totalElements;
+  final int totalPages;
+  final bool hasNext;
+  final bool hasPrevious;
+
+  PaginatedCategoryResponse({
+    required this.categories,
+    required this.page,
+    required this.size,
+    required this.totalElements,
+    required this.totalPages,
+    required this.hasNext,
+    required this.hasPrevious,
+  });
+
+  factory PaginatedCategoryResponse.fromJson(Map<String, dynamic> json) {
+    return PaginatedCategoryResponse(
+      categories: (json['content'] as List)
+          .map((item) => CategoryWithProduct.fromJson(item))
+          .toList(),
+      page: json['page'], 
+      size: json['size'], 
+      totalElements: json['totalElements'], 
+      totalPages: json['totalPages'], 
+      hasNext: json['hasNext'], 
+      hasPrevious: json['hasPrevious']
+    );
+  }
+}

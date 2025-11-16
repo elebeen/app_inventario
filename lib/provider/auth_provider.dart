@@ -1,60 +1,65 @@
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:dio/dio.dart';
-import 'dart:convert';
+import 'package:registro_productos/domain/repositories/auth_repository.dart';
 
-class AuthProvider with ChangeNotifier {
-  String? _token;
-  Map<String, dynamic>? _user;
+class AuthProvider extends ChangeNotifier {
+  final AuthRepositoryImpl _authRepository;
+  AuthProvider(this._authRepository);
 
-  bool get isAuthenticated => _token != null;
-  String? get token => _token;
-  Map<String, dynamic>? get user => _user;
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
-  final String _baseUrl = dotenv.env['BASE_URL']!;
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
+  bool get isAuthenticated => _authRepository.isAuthenticated;
+  String? get token => _authRepository.token;
+  Map<String, dynamic>? get user => _authRepository.user;
 
   Future<bool> login(String email, String password) async {
-    final dio = Dio();
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
     try {
-      final response = await dio.post(
-        '$_baseUrl/auth/login',
-        data: {'email': email, 'password': password},
-        options: Options(headers: {'Content-Type': 'application/json'}),
-      );
-
-      _token = response.data['token'];
-      _user = Map<String, dynamic>.from(response.data['usuario']);
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', _token!);
-      await prefs.setString('usuario', jsonEncode(_user));
-
-      notifyListeners();
+      await _authRepository.login(email, password);
       return true;
-    } on DioException catch (e) {
-      debugPrint('Login error: ${e.response?.data}');
-      return false;
+    } catch (e) {
+      _errorMessage = e.toString();
     }
+
+    _isLoading = false;
+    notifyListeners();
+    return false;
+  }
+
+  Future<String> register(String email, String password) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final user = await _authRepository.register(email, password);
+      return user.email;
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return "Error al crear el usuario $email";
   }
 
   Future<void> logout() async {
-    _token = null;
-    _user = null;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token');
-    await prefs.remove('usuario');
+    await _authRepository.logout();
     notifyListeners();
   }
 
   Future<void> tryAutoLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('token')) return;
-
-    _token = prefs.getString('token');
-    if (prefs.containsKey('usuario')) {
-      _user = jsonDecode(prefs.getString('usuario')!);
-    }
+    await _authRepository.tryAutoLogin();
     notifyListeners();
+  }
+
+  void updateRepository(AuthRepositoryImpl repo) {
+    // Solo actualiza si es necesario (dependencia hot reload)
   }
 }
