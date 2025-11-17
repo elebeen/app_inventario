@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:registro_productos/domain/repositories/auth_repository.dart';
+import 'package:registro_productos/data/roles.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthRepositoryImpl _authRepository;
@@ -32,13 +33,13 @@ class AuthProvider extends ChangeNotifier {
     return false;
   }
 
-  Future<String> register(String email, String password) async {
+  Future<String> register(String email, String password, Rol rol) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final user = await _authRepository.register(email, password);
+      final user = await _authRepository.register(email, password, rol);
       return user.email;
     } catch (e) {
       _errorMessage = e.toString();
@@ -47,6 +48,40 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
     return "Error al crear el usuario $email";
+  }
+
+  Future<String> edit(int id, String email, bool active, Rol rol) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final user = await _authRepository.editUser(id, email, active, rol);
+      return user.email;
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return "Error al editar el usuario $email";
+  }
+
+  Future<String> delete(int id) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final msg = await _authRepository.deleteUser(id);
+      return msg;
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return "Error al eliminar el usuario";
   }
 
   Future<void> logout() async {

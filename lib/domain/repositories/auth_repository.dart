@@ -2,14 +2,15 @@ import 'dart:convert';
 import 'package:registro_productos/core/dio_client.dart';
 import 'package:registro_productos/data/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:registro_productos/data/roles.dart';
 
 abstract class AuthRepository {
   Future<bool> login(String email, String password);
-  Future<User> register(String email, String password);
+  Future<User> register(String email, String password, Rol rol);
   Future<void> logout();
   Future<void> tryAutoLogin();
-  Future<User> editUser(int id, String email, bool active);
-  Future<void> deleteUser(int id);
+  Future<User> editUser(int id, String email, bool active, Rol rol);
+  Future<String> deleteUser(int id);
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -25,35 +26,49 @@ class AuthRepositoryImpl implements AuthRepository {
   
   @override
   Future<bool> login(String email, String password) async {
-    final response = await _api.post('/auth/login', {'email': email, 'password': password});
+    final response = await _api.post('/auth/login', {
+      'email': email,
+      'password': password
+    });
+
     _token = response.data['token'];
     _user = Map<String, dynamic>.from(response.data['usuario']);
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', _token!);
     await prefs.setString('usuario', jsonEncode(_user));
+
     return true;
   }
   
   @override
-  Future<User> register(String email, String password) async {
+  Future<User> register(String email, String password, Rol rol) async {
+    final rolString = rol.name;
     final response = await _api.post('/auth/', {
       'email': email, 
-      'password': password
+      'password': password,
+      'rolNombre': rolString
     });
+
     return User.fromJson(response.data);
   }
   
   @override
-  Future<void> deleteUser(int id) async {
-    // TODO: implement deleteUser
-    throw UnimplementedError();
+  Future<String> deleteUser(int id) async {
+    final response = await _api.delete('/auth/$id');
+    return response.data['msg'];
   }
   
   @override
-  Future<User> editUser(int id, String email, bool active) async {
-    // TODO: implement editUser
-    throw UnimplementedError();
+  Future<User> editUser(int id, String email, bool active, Rol rol) async {
+    final rolString = rol.name;
+    final response = await _api.put('/auth/$id', {
+      'email': email,
+      'active': active,
+      'rol': rolString
+    });
+
+    return User.fromJson(response.data);
   }
   
   @override
