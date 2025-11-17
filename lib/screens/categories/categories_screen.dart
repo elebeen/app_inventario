@@ -50,6 +50,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
     }
 
     if (categoryProvider.errorMessage != null) {
+      return Center(child: Text("Error: ${categoryProvider.errorMessage}"));
+    }
+
+    if (categoryProvider.categories.isEmpty) {
+      return const Center(child: Text("No se encontraron categorias."));
+    }
+
+    if (categoryProvider.errorMessage != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

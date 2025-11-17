@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:registro_productos/data/models/user_model.dart';
-import 'package:registro_productos/domain/repositories/auth_repository.dart';
 import 'package:registro_productos/data/models/role_model.dart';
 import '../domain/repositories/user_repository.dart';
 
@@ -66,7 +65,7 @@ class UserProvider extends ChangeNotifier {
       _errorMessage = null;
 
     } catch (e) {
-      _errorMessage = e.toString() + "provider";
+      _errorMessage = e.toString();
     }
 
     _isLoading = false;

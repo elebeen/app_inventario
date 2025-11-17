@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:registro_productos/data/models/user_model.dart';
+import 'package:registro_productos/screens/users/user_screen_detail.dart';
 
 class UserList extends StatelessWidget {
   final List<User> users;
@@ -35,13 +36,12 @@ class UserList extends StatelessWidget {
           subtitle: Text("ID: ${user.id}"),
           trailing: const Icon(Icons.arrow_forward_ios),
           onTap: () {
-            // Navegar al detalle
-            //Navigator.push(
-            //  context,
-              //MaterialPageRoute(
-              //  builder: (_) => CategoryDetailScreen(category: category),
-              //),
-            //);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => UserDetailScreen(user: user)
+              ),
+            );
           },
         );
       },

@@ -50,6 +50,14 @@ class _UserScreenState extends State<UserScreen> {
     }
 
     if (userProvider.errorMessage != null) {
+      return Center(child: Text("Error: ${userProvider.errorMessage}"));
+    }
+
+    if (userProvider.userResponse.content.isEmpty) {
+      return const Center(child: Text("No se encontraron usuarios."));
+    }
+
+    if (userProvider.errorMessage != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

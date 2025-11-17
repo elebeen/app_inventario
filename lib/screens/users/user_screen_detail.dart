@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:registro_productos/components/app_bar.dart';
-import 'package:registro_productos/components/product_detail.dart';
-import 'package:registro_productos/data/models/product_model.dart';
+import 'package:registro_productos/components/user_detail.dart';
+import 'package:registro_productos/data/models/user_model.dart';
 
-class ProductDetailScreen extends StatelessWidget {
-  final Product product;
+class UserDetailScreen extends StatelessWidget {
+  final User user;
 
-  const ProductDetailScreen({super.key, required this.product});
+  const UserDetailScreen({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: product.nombre),
+      appBar: CustomAppBar(title: user.email),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// 🔥 Aquí insertamos el nuevo widget reusado
-            ProductInfo(product: product),
+            UserInfo(user: user),
 
             const Spacer(),
 

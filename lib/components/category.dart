@@ -33,16 +33,7 @@ class CategoryList extends StatelessWidget {
         return ListTile(
           title: Text(category.nombre),
           subtitle: Text("ID: ${category.id}"),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () {
-            // Navegar al detalle
-            //Navigator.push(
-            //  context,
-              //MaterialPageRoute(
-              //  builder: (_) => CategoryDetailScreen(category: category),
-              //),
-            //);
-          },
+          //trailing: const Icon(Icons.arrow_forward_ios),
         );
       },
     );
