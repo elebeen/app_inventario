@@ -48,15 +48,15 @@ class PaginatedCategoryResponse {
 
   factory PaginatedCategoryResponse.fromJson(Map<String, dynamic> json) {
     return PaginatedCategoryResponse(
-      content: (json['content'] as List<dynamic>)
-          .map((c) => Category.fromJson(c))
-          .toList(),
-      page: json['page'],
-      size: json['size'],
-      totalElements: json['totalElements'],
-      totalPages: json['totalPages'],
-      hasNext: json['hasNext'],
-      hasPrevious: json['hasPrevious'],
+      content: (json['content'] as List<dynamic>?)
+              ?.map((c) => Category.fromJson(c))
+              .toList() ?? [],
+      page: json['page'] ?? 0,
+      size: json['size'] ?? 0,
+      totalElements: json['totalElements'] ?? 0,
+      totalPages: json['totalPages'] ?? 0,
+      hasNext: json['hasNext'] ?? false,
+      hasPrevious: json['hasPrevious'] ?? false,
     );
   }
 }
@@ -86,15 +86,15 @@ class CategoryWithProductsResponse {
   factory CategoryWithProductsResponse.fromJson(Map<String, dynamic> json) {
     return CategoryWithProductsResponse(
       categoria: Category.fromJson(json['categoria']),
-      productos: (json['productos'] as List<dynamic>)
-          .map((p) => Product.fromJson(p))
-          .toList(),
-      page: json['page'],
-      size: json['size'],
-      totalElements: json['totalElements'],
-      totalPages: json['totalPages'],
-      hasNext: json['hasNext'],
-      hasPrevious: json['hasPrevious'],
+      productos: (json['productos'] as List<dynamic>?)
+              ?.map((p) => Product.fromJson(p))
+              .toList() ?? [],
+      page: json['page'] ?? 0,
+      size: json['size'] ?? 0,
+      totalElements: json['totalElements'] ?? 0,
+      totalPages: json['totalPages'] ?? 0,
+      hasNext: json['hasNext'] ?? false,
+      hasPrevious: json['hasPrevious'] ?? false,
     );
   }
 }

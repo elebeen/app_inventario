@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:registro_productos/core/dio_client.dart';
 import 'package:registro_productos/domain/repositories/auth_repository.dart';
 import 'package:registro_productos/domain/repositories/product_repository.dart';
+import 'package:registro_productos/provider/category_provider.dart';
 import 'package:registro_productos/provider/product_provider.dart';
 import 'package:registro_productos/screens/home/home_screen.dart';
+import 'domain/repositories/category_repository.dart';
 import 'screens/auth/login_screen.dart';
 import 'provider/auth_provider.dart';
 import 'package:provider/provider.dart';
@@ -54,6 +56,18 @@ Future<void> main() async {
             context.read<ProductRepositoryImpl>(),
           ),
           update: (context, repo, __) => ProductProvider(repo),
+        ),
+        // 7. CategoryRepository depende de ApiService
+        ProxyProvider<ApiService, CategoryRepositoryImpl>(
+          update: (_, api, __) => CategoryRepositoryImpl(api),
+        ),
+
+        // 8. CategoryProvider depende de CategoryRepository
+        ChangeNotifierProxyProvider<CategoryRepositoryImpl, CategoryProvider>(
+          create: (context) => CategoryProvider(
+            context.read<CategoryRepositoryImpl>(),
+          ),
+          update: (context, repo, __) => CategoryProvider(repo),
         ),
       ],
       child: const MyApp(),

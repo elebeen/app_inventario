@@ -50,7 +50,9 @@ class CategoryProvider extends ChangeNotifier {
         _categorySize,
       );
 
-      _categories.addAll(resp.content);
+      if (resp.content.isNotEmpty) {
+        _categories.addAll(resp.content);
+      }
 
       if (resp.content.length < _categorySize) {
         _hasMoreCategories = false;
@@ -60,7 +62,8 @@ class CategoryProvider extends ChangeNotifier {
       _errorMessage = null;
 
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = 'Error al cargar categorías: ${e.toString()}';
+      print('Error en fetchCategories: $e'); // Para debugging
     }
 
     _isLoading = false;
@@ -153,6 +156,11 @@ class CategoryProvider extends ChangeNotifier {
     _selectedCategory = null;
     _hasMoreCategoryProducts = true;
     _categoryProductPage = 1;
+    notifyListeners();
+  }
+
+  void clearError() {
+    _errorMessage = null;
     notifyListeners();
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../data/inventory_data.dart';
-import 'create_category_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:registro_productos/components/category.dart';
+import 'package:registro_productos/provider/category_provider.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -10,104 +11,72 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-  // Abrir pantalla para crear nueva categoría
-  void crearCategoria() async {
-    final nuevaCategoria = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const CreateCategoryScreen()),
-    );
+  final ScrollController _scrollController = ScrollController();
 
-    if (nuevaCategoria != null && nuevaCategoria is String) {
-      setState(() {
-        categorias.add(nuevaCategoria);
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+
+    // Llamar a la API una sola vez
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CategoryProvider>(context, listen: false).fetchCategories();
+    });
+
+    // Scroll infinito
+    _scrollController.addListener(() {
+      final provider = Provider.of<CategoryProvider>(context, listen: false);
+
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent * 0.9 &&
+          provider.hasMoreCategories &&
+          !provider.isLoading) {
+        provider.fetchCategories();
+      }
+    });
   }
 
-  // Abrir pantalla de productos por categoría
-  void verCategoria(String categoria) {
-    final productos =
-        inventario.where((p) => p['categoria'] == categoria).toList();
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => CategoryProductsScreen(
-          categoria: categoria,
-          productos: productos,
-        ),
-      ),
-    );
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Categorías (Admin)")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+    final categoryProvider = context.watch<CategoryProvider>();
+
+    if (categoryProvider.isLoading && categoryProvider.categories.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (categoryProvider.errorMessage != null) {
+      return Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-              onPressed: crearCategoria,
-              child: const Text('Crear Categoría'),
-            ),
+            Text("Error: ${categoryProvider.errorMessage}"),
             const SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: categorias.length,
-                itemBuilder: (context, index) {
-                  final categoria = categorias[index];
-                  return Card(
-                    child: ListTile(
-                      title: Text(categoria),
-                      trailing: const Icon(Icons.arrow_forward),
-                      onTap: () => verCategoria(categoria),
-                    ),
-                  );
-                },
-              ),
+            ElevatedButton(
+              onPressed: () {
+                categoryProvider.clearError();
+                categoryProvider.fetchCategories();
+              },
+              child: const Text("Reintentar"),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
+      );
+    }
 
-// Pantalla que muestra productos de una categoría
-class CategoryProductsScreen extends StatelessWidget {
-  final String categoria;
-  final List<Map<String, dynamic>> productos;
+    if (categoryProvider.categories.isEmpty && !categoryProvider.isLoading) {
+      return const Center(child: Text("No se encontraron categorías."));
+    }
 
-  const CategoryProductsScreen({
-    super.key,
-    required this.categoria,
-    required this.productos,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Productos: $categoria')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: productos.isEmpty
-            ? const Center(child: Text('No hay productos en esta categoría.'))
-            : ListView.builder(
-                itemCount: productos.length,
-                itemBuilder: (context, index) {
-                  final p = productos[index];
-                  return Card(
-                    child: ListTile(
-                      title: Text(p['nombre'] ?? ''),
-                      subtitle: Text(
-                          'Código: ${p['codigo']}, Precio: ${p['precio']}, Stock: ${p['stock']}'),
-                    ),
-                  );
-                },
-              ),
-      ),
+    return CategoryList(
+      categoryProvider.categories,
+      _scrollController,
+      categoryProvider.hasMoreCategories,
+      categoryProvider.isLoading,
     );
   }
 }
