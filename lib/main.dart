@@ -4,8 +4,10 @@ import 'package:registro_productos/domain/repositories/auth_repository.dart';
 import 'package:registro_productos/domain/repositories/product_repository.dart';
 import 'package:registro_productos/provider/category_provider.dart';
 import 'package:registro_productos/provider/product_provider.dart';
+import 'package:registro_productos/provider/user_provider.dart';
 import 'package:registro_productos/screens/home/home_screen.dart';
 import 'domain/repositories/category_repository.dart';
+import 'domain/repositories/user_repository.dart';
 import 'screens/auth/login_screen.dart';
 import 'provider/auth_provider.dart';
 import 'package:provider/provider.dart';
@@ -68,6 +70,19 @@ Future<void> main() async {
             context.read<CategoryRepositoryImpl>(),
           ),
           update: (context, repo, __) => CategoryProvider(repo),
+        ),
+
+        // 9. UserRepository depende de ApiService
+        ProxyProvider<ApiService, UserRepositoryImpl>(
+          update: (_, api, __) => UserRepositoryImpl(api),
+        ),
+
+        // 10. UserProvider depende de UserRepository
+        ChangeNotifierProxyProvider<UserRepositoryImpl, UserProvider>(
+          create: (context) => UserProvider(
+            context.read<UserRepositoryImpl>(),
+          ),
+          update: (context, repo, __) => UserProvider(repo),
         ),
       ],
       child: const MyApp(),

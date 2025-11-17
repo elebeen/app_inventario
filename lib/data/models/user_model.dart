@@ -2,28 +2,33 @@ import 'package:registro_productos/data/models/role_model.dart';
 
 class User {
   final int id;
-  final String name;
   final String email;
-  final String password;
-  final Role roles;
+  final String passwordHash;
+  final bool activo;
+  final int tiendaId;
+  final List<Role> roles;
 
   User({
     required this.id,
-    required this.name,
     required this.email,
-    required this.password,
+    required this.passwordHash,
+    required this.activo,
+    required this.tiendaId,
     required this.roles,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'],
-      name: json['name'],
-      email: json['email'],
-      password: json['password'],
-      roles: (json['roles'] as List<dynamic>)
-          .map((role) => Role.fromJson(role))
-          .toList()[0],
+      id: json['id'] ?? 0,
+      email: json['email'] ?? '',
+      passwordHash: json['password_hash'] ?? '',
+      activo: json['activo'] ?? false,
+      tiendaId: json['tiendaId'] ?? 0,
+      roles: json['roles'] != null
+          ? (json['roles'] as List)
+              .map((item) => Role.fromJson(item))
+              .toList()
+          : [],
     );
   }
 }
@@ -49,15 +54,17 @@ class PaginatedUserResponse{
 
   factory PaginatedUserResponse.fromJson(Map<String, dynamic> json) {
     return PaginatedUserResponse(
-      content: (json['content'] as List)
-          .map((item) => User.fromJson(item))
-          .toList(),
-      page: json['page'],
-      size: json['size'],
-      totalElements: json['totalElements'],
-      totalPages: json['totalPages'],
-      hasNext: json['hasNext'],
-      hasPrevious: json['hasPrevious']
+      content: json['content'] != null
+          ? (json['content'] as List)
+              .map((item) => User.fromJson(item))
+              .toList()
+          : [],
+      page: json['page'] ?? 0,
+      size: json['size'] ?? 0,
+      totalElements: json['totalElements'] ?? 0,
+      totalPages: json['totalPages'] ?? 0,
+      hasNext: json['hasNext'] ?? false,
+      hasPrevious: json['hasPrevious'] ?? false
     );
   }
 }

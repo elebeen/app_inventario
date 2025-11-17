@@ -6,8 +6,8 @@ class Role {
 
   factory Role.fromJson(Map<String, dynamic> json) {
     return Role(
-      id: json['id'],
-      nombre: json['name'],
+      id: json['id'] ?? 0,
+      nombre: json['name'] ?? json['nombre'] ?? '',
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:registro_productos/components/user.dart';
-import 'package:registro_productos/provider/auth_provider.dart';
+import '../../provider/user_provider.dart';
 
 class UserScreen extends StatefulWidget {
   const UserScreen({super.key});
@@ -19,12 +19,12 @@ class _UserScreenState extends State<UserScreen> {
 
     // Llamar a la API una sola vez
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<AuthProvider>(context, listen: false).fetchUsers();
+      Provider.of<UserProvider>(context, listen: false).fetchUsers();
     });
 
     // Scroll infinito
     _scrollController.addListener(() {
-      final provider = Provider.of<AuthProvider>(context, listen: false);
+      final provider = Provider.of<UserProvider>(context, listen: false);
 
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent * 0.9 &&
@@ -43,9 +43,9 @@ class _UserScreenState extends State<UserScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = context.watch<AuthProvider>();
+    final userProvider = context.watch<UserProvider>();
 
-    if (userProvider.isLoading && userProvider.user!.isEmpty) {
+    if (userProvider.isLoading && userProvider.userResponse.content.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -68,7 +68,7 @@ class _UserScreenState extends State<UserScreen> {
       );
     }
 
-    if (userProvider.user!.isEmpty && !userProvider.isLoading) {
+    if (userProvider.userResponse.content.isEmpty && !userProvider.isLoading) {
       return const Center(child: Text("No se encontraron categorías."));
     }
 
