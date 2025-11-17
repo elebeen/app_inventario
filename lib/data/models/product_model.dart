@@ -20,12 +20,7 @@ class Product {
   factory Product.fromJson(Map<String, dynamic> json) {
     final categoryData = json['categoria'];
     Category? parsedCategory;
-
-    if (categoryData != null && categoryData is Map<String, dynamic>) {
-      parsedCategory = Category.fromJson(categoryData);
-    } else if (json['categoriaId'] != null) {
-      parsedCategory = Category(id: json['categoriaId'], name: null);
-    }
+    parsedCategory = Category.fromJson(categoryData);
 
     return Product(
       id: json['id'],

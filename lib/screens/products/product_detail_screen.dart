@@ -1,52 +1,39 @@
 import 'package:flutter/material.dart';
+import '../../components/app_bar.dart';
+import '../../data/models/product_model.dart';
 
 class ProductDetailScreen extends StatelessWidget {
-  final String codigo;
-  // En una app real obtendrías aquí el producto desde la nube por el código
-  const ProductDetailScreen({super.key, required this.codigo});
-
-  // Simulamos un producto retornado
-  Map<String, String> fakeProducto(String codigo) {
-    return {
-      'codigo': codigo,
-      'nombre': 'Producto de ejemplo',
-      'precio': '12.50',
-      'descripcion': 'Descripción breve del producto.',
-      'stock': '20',
-      'categoria': 'General',
-    };
-  }
+  final Product product;
+  const ProductDetailScreen({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
-    final producto = fakeProducto(codigo);
-
     return Scaffold(
-      appBar: AppBar(title: Text('Detalle producto')),
+      appBar: CustomAppBar(title: product.nombre),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Código: ${producto['codigo']}',
+              'Código: ${product.codigoBarras}',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
             Text(
-              'Nombre: ${producto['nombre']}',
+              'Nombre: ${product.nombre}',
               style: TextStyle(fontSize: 18),
             ),
             SizedBox(height: 8),
-            Text('Precio: \$${producto['precio']}'),
+            Text('Precio: \$${product.precio}'),
             SizedBox(height: 8),
-            Text('Stock: ${producto['stock']}'),
+            Text('Stock: ${product.stock}'),
             SizedBox(height: 8),
-            Text('Categoría: ${producto['categoria']}'),
+            Text('Categoría: ${product.categoria}'),
             SizedBox(height: 12),
             Text('Descripción:', style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 4),
-            Text(producto['descripcion'] ?? ''),
+            //Text(producto['descripcion'] ?? ''),
             Spacer(),
             Row(
               children: [

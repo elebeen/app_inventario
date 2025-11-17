@@ -1,41 +1,34 @@
 import 'package:registro_productos/data/models/product_model.dart';
 
-// para la relacion muchos a muchos y obtener los productos de una categoría
-class CategoryWithProduct {
-  int? id;
-  String? name;
-  List<Product>? product;
-
-  CategoryWithProduct({this.id, this.name, this.product});
-
-  factory CategoryWithProduct.fromJson(Map<String, dynamic> json) {
-    return CategoryWithProduct(
-      id: json['id'],
-      name: json['nombre'],
-      product: (json['producto'] as List<dynamic>?)
-        ?.map((e) => Product.fromJson(e as Map<String, dynamic>))
-        .toList(),
-    );
-  }
-}
-
 // para solo obtener las categorías sin productos
 class Category {
-  int? id;
-  String? name;
+  final int id;
+  final String nombre;
+  final int tiendaId;
+  final String createdAt;
+  final String updatedAt;
 
-  Category({this.id, this.name});
+  Category({
+    required this.id,
+    required this.nombre,
+    required this.tiendaId,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
       id: json['id'],
-      name: json['nombre'],
+      nombre: json['nombre'],
+      tiendaId: json['tiendaId'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
     );
   }
 }
 
 class PaginatedCategoryResponse {
-  final List<CategoryWithProduct> content;
+  final List<Category> content;
   final int page;
   final int size;
   final int totalElements;
@@ -55,15 +48,53 @@ class PaginatedCategoryResponse {
 
   factory PaginatedCategoryResponse.fromJson(Map<String, dynamic> json) {
     return PaginatedCategoryResponse(
-      content: (json['content'] as List)
-          .map((item) => CategoryWithProduct.fromJson(item))
+      content: (json['content'] as List<dynamic>)
+          .map((c) => Category.fromJson(c))
           .toList(),
-      page: json['page'], 
-      size: json['size'], 
-      totalElements: json['totalElements'], 
-      totalPages: json['totalPages'], 
-      hasNext: json['hasNext'], 
-      hasPrevious: json['hasPrevious']
+      page: json['page'],
+      size: json['size'],
+      totalElements: json['totalElements'],
+      totalPages: json['totalPages'],
+      hasNext: json['hasNext'],
+      hasPrevious: json['hasPrevious'],
+    );
+  }
+}
+
+// para la relacion muchos a muchos y obtener los productos de una categoría
+class CategoryWithProductsResponse {
+  final Category categoria;
+  final List<Product> productos;
+  final int page;
+  final int size;
+  final int totalElements;
+  final int totalPages;
+  final bool hasNext;
+  final bool hasPrevious;
+
+  CategoryWithProductsResponse({
+    required this.categoria,
+    required this.productos,
+    required this.page,
+    required this.size,
+    required this.totalElements,
+    required this.totalPages,
+    required this.hasNext,
+    required this.hasPrevious,
+  });
+
+  factory CategoryWithProductsResponse.fromJson(Map<String, dynamic> json) {
+    return CategoryWithProductsResponse(
+      categoria: Category.fromJson(json['categoria']),
+      productos: (json['productos'] as List<dynamic>)
+          .map((p) => Product.fromJson(p))
+          .toList(),
+      page: json['page'],
+      size: json['size'],
+      totalElements: json['totalElements'],
+      totalPages: json['totalPages'],
+      hasNext: json['hasNext'],
+      hasPrevious: json['hasPrevious'],
     );
   }
 }

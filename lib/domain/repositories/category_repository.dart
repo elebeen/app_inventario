@@ -2,8 +2,8 @@ import 'package:registro_productos/core/dio_client.dart';
 import 'package:registro_productos/data/models/category_model.dart';
 
 abstract class CategoryRepository {
-  Future<List<Category>> getCategories();
-  Future<PaginatedCategoryResponse> getCategory(int id);
+  Future<PaginatedCategoryResponse> getCategories(int page, int size);
+  Future<CategoryWithProductsResponse> getCategory(int id, int page, int size);
   Future<void> createCategory(String category);
   Future<void> updateCategory(String id, String category);
   Future<void> deleteCategory(String id);
@@ -12,28 +12,28 @@ abstract class CategoryRepository {
 class CategoryRepositoryImpl implements CategoryRepository {
   final ApiService _api;
   CategoryRepositoryImpl(this._api);
-
-  int? _page = 1;
-  int? _size = 10;
-
-  int? get page => _page;
-  int? get size => _size;
   
   @override
-  Future<List<Category>> getCategories() async {
-    final response = await _api.get('/categorias/');
-    return (response.data as List).map((e) => Category.fromJson(e)).toList();
+  Future<PaginatedCategoryResponse> getCategories(int page, int size) async {
+    final response = await _api.get('/categorias/',
+      params: {
+        'page': page,
+        'size': size
+      }
+    );
+
+    return PaginatedCategoryResponse.fromJson(response.data);
   }
   
   @override
-  Future<PaginatedCategoryResponse> getCategory(int id) async {
+  Future<CategoryWithProductsResponse> getCategory(int id, page, size) async {
     final response = await _api.get('/categorias/$id',
       params: {
-        'page': _page,
-        'size': _size
+        'page': page,
+        'size': size
       }
     );
-    return PaginatedCategoryResponse.fromJson(response.data);
+    return CategoryWithProductsResponse.fromJson(response.data);
   }
 
   @override

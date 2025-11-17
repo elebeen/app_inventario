@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:registro_productos/data/models/product_model.dart';
 import 'package:registro_productos/provider/product_provider.dart';
+import 'package:registro_productos/screens/products/product_detail_screen.dart';
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
@@ -72,7 +73,6 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 }
 
-//  // Este es el widget que tenías comentado, ahora recibe la lista
 class ProductList extends StatelessWidget {
   final List<Product> products;
   final ScrollController scrollController;
@@ -113,10 +113,18 @@ class ProductList extends StatelessWidget {
           child: ListTile(
             title: Text(p.nombre ?? ''),
             subtitle: Text(
-              'Código: ${p.codigoBarras} '
-                  '| Stock: ${p.stock} '
-                  '| Categoría: ${p.categoria?.name ?? 'N/A'}',
+              '| Stock: ${p.stock} '
+              '| Categoría: ${p.categoria?.nombre ?? 'N/A'}',
             ),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 18),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProductDetailScreen(product: p)
+                ),
+              );
+            },
           ),
         );
       },

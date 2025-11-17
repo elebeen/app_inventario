@@ -4,7 +4,6 @@ import 'package:registro_productos/data/models/product_model.dart';
 
 class ProductProvider extends ChangeNotifier {
   final ProductRepositoryImpl _productRepository;
-
   ProductProvider(this._productRepository);
 
   bool _isLoading = false;
@@ -37,10 +36,10 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _products = await _productRepository.fetchProducts(_page, _size);
-      _products.content.addAll(_products.content);
+      final res = await _productRepository.fetchProducts(_page, _size);
+      _products.content.addAll(res.content);
 
-      if (_products.content.length < _size) {
+      if (res.content.length < _size) {
         _hasMore = false;
       }
 
@@ -52,6 +51,22 @@ class ProductProvider extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<Product> fetchProduct(int id) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final product = await _productRepository.fetchProduct(id);
+      return product;
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return Product();
   }
 
   Future<String> createProduct(
@@ -141,6 +156,13 @@ class ProductProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
+    notifyListeners();
+  }
+
+  void resetProducts() {
+    _products.content.clear();
+    _hasMore = true;
+    _page = 1;
     notifyListeners();
   }
 }

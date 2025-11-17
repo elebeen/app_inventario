@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:registro_productos/core/dio_client.dart';
 import 'package:registro_productos/data/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:registro_productos/data/roles.dart';
+import 'package:registro_productos/data/models/role_model.dart';
 
 abstract class AuthRepository {
   Future<bool> login(String email, String password);
@@ -11,6 +11,8 @@ abstract class AuthRepository {
   Future<void> tryAutoLogin();
   Future<User> editUser(int id, String email, bool active, Rol rol);
   Future<String> deleteUser(int id);
+  Future<User> getUser(int id);
+  Future<PaginatedUserResponse> getUsers(int page, int size);
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -89,5 +91,17 @@ class AuthRepositoryImpl implements AuthRepository {
     if (prefs.containsKey('usuario')) {
       _user = jsonDecode(prefs.getString('usuario')!);
     }
+  }
+
+  @override
+  Future<User> getUser(int id) {
+    // TODO: implement getUser
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<PaginatedUserResponse> getUsers(int page, int size) {
+    // TODO: implement getUsers
+    throw UnimplementedError();
   }
 }
