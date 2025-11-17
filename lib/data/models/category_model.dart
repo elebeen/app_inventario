@@ -35,7 +35,7 @@ class Category {
 }
 
 class PaginatedCategoryResponse {
-  final List<CategoryWithProduct> categories;
+  final List<CategoryWithProduct> content;
   final int page;
   final int size;
   final int totalElements;
@@ -44,7 +44,7 @@ class PaginatedCategoryResponse {
   final bool hasPrevious;
 
   PaginatedCategoryResponse({
-    required this.categories,
+    required this.content,
     required this.page,
     required this.size,
     required this.totalElements,
@@ -55,7 +55,7 @@ class PaginatedCategoryResponse {
 
   factory PaginatedCategoryResponse.fromJson(Map<String, dynamic> json) {
     return PaginatedCategoryResponse(
-      categories: (json['content'] as List)
+      content: (json['content'] as List)
           .map((item) => CategoryWithProduct.fromJson(item))
           .toList(),
       page: json['page'], 

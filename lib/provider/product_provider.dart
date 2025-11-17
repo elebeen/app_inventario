@@ -10,6 +10,11 @@ class ProductProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool _hasMore = true;
+  bool get hasMore => _hasMore;
+  int _page = 0;
+  final int _size = 20;
+
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
@@ -26,12 +31,21 @@ class ProductProvider extends ChangeNotifier {
   PaginatedProductsResponse get products => _products;
 
   Future<void> fetchProducts() async {
+    if (_isLoading || !_hasMore) return;
+
     _isLoading = true;
-    _errorMessage = null;
     notifyListeners();
 
     try {
-      _products = await _productRepository.fetchProducts();
+      _products = await _productRepository.fetchProducts(_page, _size);
+      _products.content.addAll(_products.content);
+
+      if (_products.content.length < _size) {
+        _hasMore = false;
+      }
+
+      _page++;
+      _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
     }
@@ -40,6 +54,93 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Aquí puedes agregar más lógica (createProduct, deleteProduct, etc.)
-  // y llamar a notifyListeners() cuando el estado cambie.
+  Future<String> createProduct(
+    String codigoBarras,
+    String nombre,
+    double precio,
+    int stock,
+    int categoria
+  ) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final product = await _productRepository.createProduct(
+        codigoBarras,
+        nombre,
+        precio,
+        stock,
+        categoria
+      );
+      return product.nombre.toString();
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return "Error al crear el producto $nombre";
+  }
+
+  Future<String> updateProduct(
+    int id,
+    String nombre,
+    double precio,
+    int stock,
+    int categoria
+  ) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final product = await _productRepository.updateProduct(
+        id,
+        nombre,
+        precio,
+        stock,
+        categoria
+      );
+      return product.nombre.toString();
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return "Error al actualizar el producto $nombre";
+  }
+
+  Future<Product> updateStock(int id, int stock) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final product = await _productRepository.updateStock(id, stock);
+      return product;
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return Product();
+  }
+
+  Future<void> deleteProduct(int id) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _productRepository.deleteProduct(id);
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
 }
