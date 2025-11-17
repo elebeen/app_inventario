@@ -17,7 +17,7 @@ class ProductProvider extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  PaginatedProductsResponse _products = PaginatedProductsResponse(
+  final PaginatedProductsResponse _products = PaginatedProductsResponse(
     content: [],
     page: 1,
     size: 10,

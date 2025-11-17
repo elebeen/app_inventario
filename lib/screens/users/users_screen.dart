@@ -1,176 +1,82 @@
 import 'package:flutter/material.dart';
-//import '../../data/users_data.dart';
+import 'package:provider/provider.dart';
+import 'package:registro_productos/components/user.dart';
+import 'package:registro_productos/provider/auth_provider.dart';
 
-class UserScreen extends StatelessWidget {
+class UserScreen extends StatefulWidget {
   const UserScreen({super.key});
 
   @override
+  State<UserScreen> createState() => _UserScreenState();
+}
+
+class _UserScreenState extends State<UserScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Llamar a la API una sola vez
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AuthProvider>(context, listen: false).fetchUsers();
+    });
+
+    // Scroll infinito
+    _scrollController.addListener(() {
+      final provider = Provider.of<AuthProvider>(context, listen: false);
+
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent * 0.9 &&
+          provider.hasMore&&
+          !provider.isLoading) {
+        provider.fetchUsers();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Usuarios (Admin)')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+    final userProvider = context.watch<AuthProvider>();
+
+    if (userProvider.isLoading && userProvider.user!.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (userProvider.errorMessage != null) {
+      return Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const CreateUserScreen()),
-              ),
-              child: const Text('Crear Usuario'),
-            ),
+            Text("Error: ${userProvider.errorMessage}"),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ViewUsersScreen()),
-              ),
-              child: const Text('Ver Usuarios'),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const UserHistoryScreen()),
-              ),
-              child: const Text('Historial Usuarios'),
+              onPressed: () {
+                userProvider.clearError();
+                userProvider.fetchUsers();
+              },
+              child: const Text("Reintentar"),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// ---------------------- Crear Usuario ----------------------
-class CreateUserScreen extends StatefulWidget {
-  const CreateUserScreen({super.key});
-
-  @override
-  State<CreateUserScreen> createState() => _CreateUserScreenState();
-}
-
-class _CreateUserScreenState extends State<CreateUserScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nombreCtrl = TextEditingController();
-  final TextEditingController _rolCtrl = TextEditingController();
-
-  void guardarUsuario() {
-    if (_formKey.currentState?.validate() ?? false) {
-      final nuevoUsuario = {
-        'nombre': _nombreCtrl.text,
-        'rol': _rolCtrl.text,
-        'fecha': DateTime.now().toString(),
-      };
-      usuarios.add(nuevoUsuario);
-
-      // Guardar en historial
-      historialUsuarios.add({
-        'accion': 'Usuario creado',
-        'usuario': _nombreCtrl.text,
-        'fecha': DateTime.now().toString(),
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Usuario creado exitosamente')),
       );
-      Navigator.pop(context);
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Crear Usuario')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _nombreCtrl,
-                decoration: const InputDecoration(labelText: 'Nombre'),
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'Ingrese nombre' : null,
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _rolCtrl,
-                decoration: const InputDecoration(labelText: 'Rol'),
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'Ingrese rol' : null,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: guardarUsuario,
-                child: const Text('Guardar Usuario'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+    if (userProvider.user!.isEmpty && !userProvider.isLoading) {
+      return const Center(child: Text("No se encontraron categorías."));
+    }
 
-// ---------------------- Ver Usuarios ----------------------
-class ViewUsersScreen extends StatelessWidget {
-  const ViewUsersScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Usuarios Registrados')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: usuarios.isEmpty
-            ? const Center(child: Text('No hay usuarios registrados.'))
-            : ListView.builder(
-                itemCount: usuarios.length,
-                itemBuilder: (context, index) {
-                  final u = usuarios[index];
-                  return Card(
-                    child: ListTile(
-                      title: Text(u['nombre']),
-                      subtitle: Text('Rol: ${u['rol']}'),
-                    ),
-                  );
-                },
-              ),
-      ),
-    );
-  }
-}
-
-// ---------------------- Historial Usuarios ----------------------
-class UserHistoryScreen extends StatelessWidget {
-  const UserHistoryScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Historial de Usuarios')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: historialUsuarios.isEmpty
-            ? const Center(child: Text('No hay historial registrado.'))
-            : ListView.builder(
-                itemCount: historialUsuarios.length,
-                itemBuilder: (context, index) {
-                  final h = historialUsuarios[index];
-                  return Card(
-                    child: ListTile(
-                      title: Text(h['accion']),
-                      subtitle: Text(
-                          'Usuario: ${h['usuario']}\nFecha: ${h['fecha']}'),
-                    ),
-                  );
-                },
-              ),
-      ),
+    return UserList(
+      userProvider.userResponse.content,
+      _scrollController,
+      userProvider.hasMore,
+      userProvider.isLoading,
     );
   }
 }

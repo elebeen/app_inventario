@@ -63,7 +63,6 @@ class CategoryProvider extends ChangeNotifier {
 
     } catch (e) {
       _errorMessage = 'Error al cargar categorías: ${e.toString()}';
-      print('Error en fetchCategories: $e'); // Para debugging
     }
 
     _isLoading = false;

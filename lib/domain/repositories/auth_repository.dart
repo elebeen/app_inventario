@@ -58,6 +58,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<String> deleteUser(int id) async {
     final response = await _api.delete('/auth/$id');
+
     return response.data['msg'];
   }
   
@@ -100,8 +101,14 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<PaginatedUserResponse> getUsers(int page, int size) {
-    // TODO: implement getUsers
-    throw UnimplementedError();
+  Future<PaginatedUserResponse> getUsers(int page, int size) async {
+    final response =  await _api.get('/auth/',
+      params: {
+        'page': page,
+        'size': size
+      }
+    );
+
+    return PaginatedUserResponse.fromJson(response.data);
   }
 }
