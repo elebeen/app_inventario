@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:registro_productos/components/app_bar.dart';
+import 'package:registro_productos/data/models/product_model.dart';
+import 'package:registro_productos/provider/category_provider.dart';
+import 'package:registro_productos/provider/product_provider.dart';
 
 class AddProductScreen extends StatefulWidget {
   final String initialBarcode;
@@ -20,11 +24,16 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   final TextEditingController stockController = TextEditingController();
+  int? _selectedCategoryId;
 
   @override
   void initState() {
     super.initState();
     barcodeController = TextEditingController(text: widget.initialBarcode);
+    // cargar categorías después del primer frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CategoryProvider>(context, listen: false).fetchCategories();
+    });
   }
 
   @override
@@ -36,17 +45,56 @@ class _AddProductScreenState extends State<AddProductScreen> {
     super.dispose();
   }
 
-  void saveProduct() {
-    if (_formKey.currentState!.validate()) {
-      // Aquí llamas a tu Provider o API
+  Future<void> saveProduct() async {
+    // 1. Validar el formulario localmente
+    if (!_formKey.currentState!.validate()) return;
+
+    // 2. Validar la categoría
+    if (_selectedCategoryId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecciona una categoría')),
+      );
+      return;
+    }
+
+    // 3. Obtener el provider (sin escuchar cambios, solo para llamar al método)
+    final productProvider = Provider.of<ProductProvider>(context, listen: false);
+
+    // 4. Llamar a crear producto y ESPERAR (await) el resultado
+    await productProvider.createProduct(
+      barcodeController.text,
+      nameController.text,
+      double.parse(priceController.text),
+      int.parse(stockController.text),
+      _selectedCategoryId!,
+    );
+
+    // Verificar si el widget sigue montado antes de usar el contexto
+    if (!mounted) return;
+
+    // 5. Verificar si hubo error en el provider
+    if (productProvider.errorMessage == null) {
+      // ÉXITO: Mostrar mensaje y regresar
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Producto guardado')),
+      );
+      // Usamos pop porque esta pantalla está "encima" de la lista de productos.
+      // Al cerrarla, volveremos a ver la lista actualizada (si usas watch allá).
+      Navigator.pop(context); 
+    } else {
+      // ERROR: Mostrar el mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${productProvider.errorMessage}'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final categories = context.watch<CategoryProvider>();
     return Scaffold(
       appBar: CustomAppBar(title: "Agregar producto"),
       body: Padding(
@@ -101,10 +149,34 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
               const SizedBox(height: 20),
 
+              // Dropdown de categorías
+              DropdownButtonFormField<int>(
+                initialValue: _selectedCategoryId,
+                decoration: const InputDecoration(
+                  labelText: 'Categoría',
+                  border: OutlineInputBorder(),
+                ),
+                items: categories.categories.map((cat) {
+                  return DropdownMenuItem<int>(
+                    value: cat.id,
+                    child: Text(cat.nombre),
+                  );
+                }).toList(),
+                onChanged: (v) => setState(() => _selectedCategoryId = v),
+                validator: (v) => v == null ? 'Selecciona una categoría' : null,
+              ),
+
+              const SizedBox(height: 20),
+
               ElevatedButton(
                 onPressed: saveProduct,
                 child: const Text("Guardar producto"),
               ),
+              if (categories.errorMessage != null)
+                Text(
+                  "Error: ${categories.errorMessage}",
+                  style: const TextStyle(color: Colors.red),
+                )
             ],
           ),
         ),

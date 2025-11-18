@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:registro_productos/provider/product_provider.dart';
 import '../../components/product.dart';
+import 'package:registro_productos/screens/products/scan_product.dart';
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
@@ -48,24 +49,34 @@ class _ProductScreenState extends State<ProductScreen> {
     // cada vez que ProductProvider llame a notifyListeners()
     final productProvider = context.watch<ProductProvider>();
 
-    // Mostramos diferentes UI según el estado del ViewModel
+    Widget screenBody;
     if (productProvider.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      screenBody = const Center(child: CircularProgressIndicator());
+    } else if (productProvider.errorMessage != null) {
+      screenBody = Center(child: Text("Error: ${productProvider.errorMessage}"));
+    } else if (productProvider.products.content.isEmpty) {
+      screenBody = const Center(child: Text("No se encontraron productos."));
+    } else {
+      screenBody = ProductList(
+        productProvider.products.content,
+        _scrollController,
+        productProvider.hasMore,
+        productProvider.isLoading,
+      );
     }
 
-    if (productProvider.errorMessage != null) {
-      return Center(child: Text("Error: ${productProvider.errorMessage}"));
-    }
-
-    if (productProvider.products.content.isEmpty) {
-      return const Center(child: Text("No se encontraron productos."));
-    }
-
-    return ProductList(
-      productProvider.products.content,
-      _scrollController,
-      productProvider.hasMore,
-      productProvider.isLoading,
+    return Scaffold(
+      body: screenBody,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blueAccent,
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ScanProductScreen()),
+          );
+        },
+      ),
     );
   }
 }
