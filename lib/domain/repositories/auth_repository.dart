@@ -37,13 +37,6 @@ class AuthRepositoryImpl implements AuthRepository {
   }
   
   @override
-  Future<String> deleteUser(int id) async {
-    final response = await _api.delete('/auth/$id');
-
-    return response.data['msg'];
-  }
-  
-  @override
   Future<void> logout() async {
     _token = null;
     _user = null;

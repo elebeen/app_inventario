@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:registro_productos/data/models/user_model.dart';
 import 'package:registro_productos/domain/repositories/auth_repository.dart';
-import 'package:registro_productos/data/models/role_model.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthRepositoryImpl _authRepository;

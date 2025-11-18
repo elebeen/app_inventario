@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:registro_productos/provider/product_provider.dart';
-
 import '../../components/product.dart';
 
 class ProductScreen extends StatefulWidget {

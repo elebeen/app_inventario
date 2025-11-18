@@ -56,13 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: CustomBottomBar(
         currentIndex: _currentIndex,
         onTap: _onItemTapped,
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blueAccent,
-        child: const Icon(Icons.add),
-        // Agregar un nuevo producto
-        onPressed: () {},
-      ),
+      )
     );
   }
 }
