@@ -29,6 +29,9 @@ class ProductProvider extends ChangeNotifier {
   
   PaginatedProductsResponse get products => _products;
 
+  Product? _currentProduct;
+  Product? get currentProduct => _currentProduct;
+
   Future<void> fetchProducts() async {
     if (_isLoading || !_hasMore) return;
 
@@ -55,18 +58,21 @@ class ProductProvider extends ChangeNotifier {
 
   Future<Product> fetchProduct(int id) async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
       final product = await _productRepository.fetchProduct(id);
+      _currentProduct = product;
       return product;
     } catch (e) {
       _errorMessage = e.toString();
+      _currentProduct = null;
+      throw e;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
-
-    _isLoading = false;
-    notifyListeners();
-    return Product();
   }
 
   Future<String> createProduct(
@@ -163,6 +169,11 @@ class ProductProvider extends ChangeNotifier {
     _products.content.clear();
     _hasMore = true;
     _page = 1;
+    notifyListeners();
+  }
+
+  void clearCurrentProduct() {
+    _currentProduct = null;
     notifyListeners();
   }
 }

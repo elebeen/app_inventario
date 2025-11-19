@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:registro_productos/components/app_bar.dart';
-import 'package:registro_productos/data/models/product_model.dart';
 import 'package:registro_productos/provider/category_provider.dart';
 import 'package:registro_productos/provider/product_provider.dart';
 
