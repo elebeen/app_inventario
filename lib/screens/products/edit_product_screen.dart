@@ -110,7 +110,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Producto $nombre actualizado.')),
       );
-      Navigator.pop(context);
+      
+    Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

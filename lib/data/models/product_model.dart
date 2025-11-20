@@ -20,7 +20,13 @@ class Product {
   factory Product.fromJson(Map<String, dynamic> json) {
     final categoryData = json['categoria'];
     Category? parsedCategory;
-    parsedCategory = Category.fromJson(categoryData);
+    if (categoryData != null) {
+      // Si no es nulo, se procede a la deserialización segura
+      parsedCategory = Category.fromJson(categoryData as Map<String, dynamic>);
+    } else {
+      // Si es nulo, se asigna null a parsedCategory, lo cual es correcto
+      parsedCategory = null;
+    }
 
     return Product(
       id: json['id'],

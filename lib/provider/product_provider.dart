@@ -68,7 +68,7 @@ class ProductProvider extends ChangeNotifier {
     } catch (e) {
       _errorMessage = e.toString();
       _currentProduct = null;
-      throw e;
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();

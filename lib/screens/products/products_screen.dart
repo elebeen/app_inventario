@@ -75,6 +75,9 @@ class _ProductScreenState extends State<ProductScreen> {
             context,
             MaterialPageRoute(builder: (_) => const ScanProductScreen()),
           );
+          // final provider = Provider.of<ProductProvider>(context, listen: false);
+          // provider.resetProducts(); // Limpia la lista actual y resetea la página
+          // provider.fetchProducts();
         },
       ),
     );
