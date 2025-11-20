@@ -21,16 +21,18 @@ class _ProductScreenState extends State<ProductScreen> {
     // Usamos addPostFrameCallback para asegurar que el 'context' esté listo
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // listen: false porque solo queremos llamar a la función, no escuchar cambios
-      Provider.of<ProductProvider>(context, listen: false).fetchProducts();
+      Provider.of<ProductProvider>(context, listen: false).refreshProducts();
     });
 
     _scrollController.addListener(() {
       final provider = Provider.of<ProductProvider>(context, listen: false);
 
+      if (provider.products.page == 1) return;
+
       if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent * 0.9 &&
-          provider.hasMore &&
-          !provider.isLoading) {
+        _scrollController.position.maxScrollExtent * 0.9 &&
+        provider.hasMore &&
+        !provider.isLoading) {
         provider.fetchProducts();
       }
     });
@@ -73,14 +75,6 @@ class _ProductScreenState extends State<ProductScreen> {
             context,
             MaterialPageRoute(builder: (_) => const ScanProductScreen()),
           );
-
-          // 2. Verificamos que el widget siga montado
-          if (!context.mounted) return;
-
-          // 3. Reseteamos y cargamos de nuevo
-          final provider = Provider.of<ProductProvider>(context, listen: false);
-          provider.resetProducts(); // Limpia la lista y reinicia paginación
-          provider.fetchProducts(); // Carga la primera página
         },
       ),
     );

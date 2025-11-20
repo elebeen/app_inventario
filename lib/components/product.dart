@@ -23,15 +23,21 @@ class ProductList extends StatelessWidget {
       itemCount: products.length + (hasMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == products.length) {
-          return const Padding(
-            padding: EdgeInsets.all(16),
-            child: Center(child: CircularProgressIndicator()),
-          );
+          if (isLoading) {
+            return const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          } else {
+            // Si hay más páginas pero no estamos cargando, mostramos un espacio vacío
+            // Esto evita que el spinner aparezca "porque sí" debajo de la lista.
+            return const SizedBox.shrink();
+          }
         }
 
         final product = products[index];
 
-      return ListTile(
+        return ListTile(
           title: Text(product.nombre.toString()),
           subtitle: Text("ID: ${product.id}"),
           trailing: const Icon(Icons.arrow_forward_ios),

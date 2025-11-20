@@ -165,17 +165,44 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void resetProducts() {
+  Future<void> refreshProducts() async {
+    // 1. Bloqueamos inmediatamente para evitar que el ScrollController pida datos
+    _isLoading = true;
+    notifyListeners(); // Esto mostrará el CircularProgressIndicator de inmediato
+
+    // 2. Limpiamos la lista y reseteamos contadores mientras está cargando
     _products.content.clear();
-    _hasMore = true;
     _page = 0;
+    _hasMore = true;
     _errorMessage = null;
-    notifyListeners();
+
+    try {
+      // 3. Hacemos la petición directamente (sin llamar a fetchProducts para evitar chequeos extra)
+      final res = await _productRepository.fetchProducts(_page, _size);
+      
+      // 4. Agregamos los datos nuevos
+      _products.content.addAll(res.content);
+
+      // 5. Verificamos si hay más páginas
+      if (res.content.length < _size) {
+        _hasMore = false;
+      }
+
+      // Preparamos la siguiente página
+      _page++;
+      
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      // 6. Desbloqueamos al final
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void resetPagination() {
     _hasMore = true;
-    _page = 0;
+    _page = 1;
     _errorMessage = null;
     notifyListeners();
   }

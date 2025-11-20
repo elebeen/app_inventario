@@ -20,9 +20,9 @@ class _ProductDetailScreen extends State<ProductDetailScreen> {
     await productProvider.deleteProduct(widget.product.id!);
     if (!mounted) return;
     // Después de eliminar, recargar la lista de productos para reflejar el cambio
-    productProvider.resetProducts();
-    await productProvider.fetchProducts();
+    productProvider.refreshProducts();
     productProvider.clearLoading();
+    print("Productos cargados delete_product_screen");
     if (!mounted) return;
 
     Navigator.pop(context);
@@ -37,7 +37,7 @@ class _ProductDetailScreen extends State<ProductDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 🔥 Aquí insertamos el nuevo widget reusado
+            // Aquí insertamos el nuevo widget reusado
             ProductInfo(product: widget.product),
 
             const Spacer(),
