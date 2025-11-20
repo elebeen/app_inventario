@@ -44,9 +44,6 @@ class _ProductScreenState extends State<ProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Ya no necesitas el FutureBuilder.
-    // Usamos context.watch para que el widget se reconstruya
-    // cada vez que ProductProvider llame a notifyListeners()
     final productProvider = context.watch<ProductProvider>();
 
     Widget screenBody;
@@ -70,14 +67,20 @@ class _ProductScreenState extends State<ProductScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blueAccent,
         child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          // 1. Esperamos a que la pantalla de Scan/Añadir se cierre
+          await Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const ScanProductScreen()),
           );
-          // final provider = Provider.of<ProductProvider>(context, listen: false);
-          // provider.resetProducts(); // Limpia la lista actual y resetea la página
-          // provider.fetchProducts();
+
+          // 2. Verificamos que el widget siga montado
+          if (!context.mounted) return;
+
+          // 3. Reseteamos y cargamos de nuevo
+          final provider = Provider.of<ProductProvider>(context, listen: false);
+          provider.resetProducts(); // Limpia la lista y reinicia paginación
+          provider.fetchProducts(); // Carga la primera página
         },
       ),
     );

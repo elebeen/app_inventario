@@ -77,11 +77,18 @@ class _AddProductScreenState extends State<AddProductScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Producto guardado')),
       );
+      
+      // Resetear el loading y la lista de productos
+      productProvider.clearLoading();
+      productProvider.resetPagination();
+      
       // Usamos pop porque esta pantalla está "encima" de la lista de productos.
       // Al cerrarla, volveremos a ver la lista actualizada (si usas watch allá).
       Navigator.pop(context); 
     } else {
-      // ERROR: Mostrar el mensaje de error
+      // ERROR: Mostrar el mensaje de error y resetear loading
+      productProvider.clearLoading();
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: ${productProvider.errorMessage}'),
@@ -94,6 +101,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     final categories = context.watch<CategoryProvider>();
+    final products = context.watch<ProductProvider>();
+    
     return Scaffold(
       appBar: CustomAppBar(title: "Agregar producto"),
       body: Padding(
@@ -150,7 +159,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
               // Dropdown de categorías
               DropdownButtonFormField<int>(
-                initialValue: _selectedCategoryId,
+                value: _selectedCategoryId,
                 decoration: const InputDecoration(
                   labelText: 'Categoría',
                   border: OutlineInputBorder(),
@@ -168,8 +177,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
               const SizedBox(height: 20),
 
               ElevatedButton(
-                onPressed: saveProduct,
-                child: const Text("Guardar producto"),
+                onPressed: products.isLoading ? null : saveProduct,
+                child: products.isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text("Guardar producto"),
               ),
               if (categories.errorMessage != null)
                 Text(

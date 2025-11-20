@@ -24,6 +24,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   int? _selectedCategoryId;
 
   bool _controllersInitialized = false;
+  late ProductProvider _productProvider;
 
   @override
   void initState() {
@@ -51,6 +52,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _productProvider = Provider.of<ProductProvider>(context, listen: false);
+    
+    // Inicializar controladores aquí, no en build()
+    if (!_controllersInitialized && _productProvider.currentProduct != null) {
+      _initializeControllers(_productProvider.currentProduct!);
+    }
+  }
+
   // Función para inicializar los controladores con los datos del producto
   void _initializeControllers(Product product) {
     // Solo inicializa la primera vez
@@ -74,7 +86,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _priceController.dispose();
     _stockController.dispose();
     // Limpiar el producto actual al salir de la pantalla
-    Provider.of<ProductProvider>(context, listen: false).clearCurrentProduct();
+    _productProvider.clearCurrentProduct();
     super.dispose();
   }
 
@@ -111,7 +123,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
         SnackBar(content: Text('Producto $nombre actualizado.')),
       );
       
-    Navigator.pop(context);
+      // Solo resetear la paginación, no limpiar la lista de productos
+      productProvider.resetPagination();
+      productProvider.clearLoading();
+      
+      Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -144,11 +160,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
             productProvider.errorMessage ?? "No se encontraron datos para el ID: ${widget.id}"
         )),
       );
-    }
-
-    // Inicializar controladores cuando el producto está disponible
-    if (!_controllersInitialized) {
-      _initializeControllers(initialProduct);
     }
 
     // Manejar errores o carga de categorías de forma más integrada

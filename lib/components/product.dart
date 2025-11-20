@@ -35,7 +35,8 @@ class ProductList extends StatelessWidget {
           title: Text(product.nombre.toString()),
           subtitle: Text("ID: ${product.id}"),
           trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () {
+          onTap: () { // <--- Convertir a async
+            // 1. Esperamos a que vuelva del detalle (donde pudo haber editado)
             Navigator.push(
               context,
               MaterialPageRoute(

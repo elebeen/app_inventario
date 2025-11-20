@@ -168,12 +168,25 @@ class ProductProvider extends ChangeNotifier {
   void resetProducts() {
     _products.content.clear();
     _hasMore = true;
-    _page = 1;
+    _page = 0;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  void resetPagination() {
+    _hasMore = true;
+    _page = 0;
+    _errorMessage = null;
     notifyListeners();
   }
 
   void clearCurrentProduct() {
     _currentProduct = null;
+    notifyListeners();
+  }
+
+  void clearLoading() {
+    _isLoading = false;
     notifyListeners();
   }
 }
