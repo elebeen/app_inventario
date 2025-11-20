@@ -19,6 +19,12 @@ class _ProductDetailScreen extends State<ProductDetailScreen> {
     final productProvider = Provider.of<ProductProvider>(context, listen: false);
     await productProvider.deleteProduct(widget.product.id!);
     if (!mounted) return;
+    // Después de eliminar, recargar la lista de productos para reflejar el cambio
+    productProvider.resetProducts();
+    await productProvider.fetchProducts();
+    productProvider.clearLoading();
+    if (!mounted) return;
+
     Navigator.pop(context);
   }
 
