@@ -22,7 +22,6 @@ class _ProductDetailScreen extends State<ProductDetailScreen> {
     // Después de eliminar, recargar la lista de productos para reflejar el cambio
     productProvider.refreshProducts();
     productProvider.clearLoading();
-    print("Productos cargados delete_product_screen");
     if (!mounted) return;
 
     Navigator.pop(context);

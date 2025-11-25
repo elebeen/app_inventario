@@ -6,7 +6,7 @@ abstract class UserRepository {
   Future<User> register(String email, String password, Rol rol);
   Future<User> editUser(int id, String email, bool active, Rol rol);
   Future<String> deleteUser(int id);
-  Future<User> getUser(int id);
+  // Future<User> getUser(int id);
   Future<PaginatedUserResponse> getUsers(int page, int size);
 }
 
@@ -53,11 +53,9 @@ class UserRepositoryImpl implements UserRepository {
     return User.fromJson(response.data);
   }
 
-  @override
-  Future<User> getUser(int id) {
-    // TODO: implement getUser
-    throw UnimplementedError();
-  }
+  // @override
+  // Future<User> getUser(int id) {
+  // }
 
   @override
   Future<PaginatedUserResponse> getUsers(int page, int size) async {

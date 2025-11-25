@@ -81,7 +81,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
       // Resetear el loading y la lista de productos
       productProvider.refreshProducts();
       productProvider.clearLoading();
-      print("Productos cargados add_product_screen");
       
       // Usamos pop porque esta pantalla está "encima" de la lista de productos.
       // Al cerrarla, volveremos a ver la lista actualizada (si usas watch allá).

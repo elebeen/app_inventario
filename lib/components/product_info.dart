@@ -23,7 +23,7 @@ class ProductInfo extends StatelessWidget {
         ),
         const SizedBox(height: 8),
 
-        Text('Precio: \$${product.precio}'),
+        Text('Precio: \$${product.precio.toString()}'),
         const SizedBox(height: 8),
 
         Text('Stock: ${product.stock}'),

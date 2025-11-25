@@ -79,10 +79,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final response = await _api.get('/auth/refresh-token');
       if (response.statusCode == 200) {
-        print(response.statusCode);
         return true;
       } else {
-        print(response.statusCode);
         return false;
       }
     } catch (e) {
