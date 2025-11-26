@@ -38,6 +38,9 @@ class CategoryProvider extends ChangeNotifier {
   int _categoryProductPage = 1;
   final int _categoryProductSize = 20;
 
+  // categoria.Category? _currentCategory;
+  // categoria.Category? get currentCategory => _currentCategory;
+
   Future<void> fetchCategories() async {
     if (_isLoading || !_hasMoreCategories) return;
 
@@ -115,7 +118,7 @@ class CategoryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateCategory(String id, String name) async {
+  Future<void> updateCategory(int id, String name) async {
     _isLoading = true;
     notifyListeners();
 
@@ -129,7 +132,7 @@ class CategoryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> deleteCategory(String id) async {
+  Future<void> deleteCategory(int id) async {
     _isLoading = true;
     notifyListeners();
 

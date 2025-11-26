@@ -35,15 +35,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
     });
   }
 
-  @override
-  void dispose() {
-    barcodeController.dispose();
-    nameController.dispose();
-    priceController.dispose();
-    stockController.dispose();
-    super.dispose();
-  }
-
   Future<void> saveProduct() async {
     // 1. Validar el formulario localmente
     if (!_formKey.currentState!.validate()) return;
@@ -96,6 +87,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
         ),
       );
     }
+  }
+
+  @override
+  void dispose() {
+    barcodeController.dispose();
+    nameController.dispose();
+    priceController.dispose();
+    stockController.dispose();
+    super.dispose();
   }
 
   @override
