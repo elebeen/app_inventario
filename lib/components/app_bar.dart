@@ -16,10 +16,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final auth = Provider.of<AuthProvider>(context);
-    // final user = auth.user;
-    // final name = (user?['email'] ?? '').toString().split('@')[0];
-
     return AppBar(
       title: Text(
         title ?? '',

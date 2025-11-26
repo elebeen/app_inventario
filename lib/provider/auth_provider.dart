@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:registro_productos/data/models/user_model.dart';
 import 'package:registro_productos/domain/repositories/auth_repository.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -50,9 +49,5 @@ class AuthProvider extends ChangeNotifier {
   void clearError() {
     _errorMessage = null;
     notifyListeners();
-  }
-
-  Future<User?> loadUserFromPrefs() {
-    return _authRepository.loadUserFromPrefs();
   }
 }

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:registro_productos/core/dio_client.dart';
-import 'package:registro_productos/data/models/user_model.dart';
 import 'package:registro_productos/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -61,6 +60,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
     try {
       final response = validateToken();
+      print("fecth token: $response");
       if (await response == true) {
         _token = prefs.getString('token');
         if (prefs.containsKey('usuario')) {
@@ -86,24 +86,6 @@ class AuthRepositoryImpl implements AuthRepository {
       }
     } catch (e) {
       return false;
-    }
-  }
-  Future<User?> loadUserFromPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userJsonString = prefs.getString('usuario');
-
-    if (userJsonString == null || userJsonString.isEmpty) {
-      return null; // No hay datos de usuario guardados
-    }
-
-    try {
-      // 1. Decodificar la cadena JSON a un Map<String, dynamic>
-      final userMap = jsonDecode(userJsonString) as Map<String, dynamic>;
-      
-      // 2. Usar el factory constructor para crear la instancia de User
-      return User.fromJson(userMap);
-    } catch (e) {
-      return null;
     }
   }
 }

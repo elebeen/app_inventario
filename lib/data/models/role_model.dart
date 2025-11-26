@@ -15,6 +15,7 @@ class Role {
 }
 
 enum Rol {
+  admin_tienda,
   admin_tienda_secundario,
   empleado_tienda
 }

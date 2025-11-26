@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:registro_productos/screens/categories/categories_screen.dart';
 import 'package:registro_productos/screens/products/products_screen.dart';
-import 'package:registro_productos/screens/settings/settings.dart';
+import 'package:registro_productos/screens/account/account.dart';
 import 'package:registro_productos/screens/users/users_screen.dart';
 import 'package:registro_productos/provider/auth_provider.dart';
 import 'package:registro_productos/components/app_bar.dart';
@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ProductScreen(), // 0. Productos (Usando tu InventoryScreen)
     CategoryScreen(), // 1. Categorías
     UserScreen(), // 2. Usuarios
-    SettingScreen(), // 3. Settings (Pantalla de ejemplo abajo)
+    AccountScreen(), // 3. Account (Pantalla de ejemplo abajo)
   ];
 
   void _onItemTapped(int index) {
@@ -42,15 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: _pageTitles[_currentIndex],
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              auth.logout();
-            },
-          ),
-        ],
+        title: _pageTitles[_currentIndex]
       ),
       body: _pages.elementAt(_currentIndex),
       bottomNavigationBar: CustomBottomBar(
