@@ -9,12 +9,12 @@ class UserList extends StatelessWidget {
   final bool isLoading;
 
   const UserList(
-      this.users,
-      this.scrollController,
-      this.hasMore,
-      this.isLoading, {
-        super.key,
-      });
+    this.users,
+    this.scrollController,
+    this.hasMore,
+    this.isLoading, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
