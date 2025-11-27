@@ -60,7 +60,6 @@ class AuthRepositoryImpl implements AuthRepository {
 
     try {
       final response = validateToken();
-      print("fecth token: $response");
       if (await response == true) {
         _token = prefs.getString('token');
         if (prefs.containsKey('usuario')) {

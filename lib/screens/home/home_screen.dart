@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:registro_productos/screens/categories/categories_screen.dart';
 import 'package:registro_productos/screens/products/products_screen.dart';
-import 'package:registro_productos/screens/account/account.dart';
 import 'package:registro_productos/screens/users/users_screen.dart';
-import 'package:registro_productos/provider/auth_provider.dart';
-import 'package:registro_productos/components/app_bar.dart';
+import 'package:registro_productos/screens/account/account.dart';
 import 'package:registro_productos/components/bottom_bar.dart';
+import 'package:registro_productos/components/app_bar.dart';
+import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -38,8 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<AuthProvider>(context, listen: false);
-
     return Scaffold(
       appBar: CustomAppBar(
         title: _pageTitles[_currentIndex]

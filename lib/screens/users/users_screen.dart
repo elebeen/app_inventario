@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:registro_productos/components/user.dart';
+import 'package:registro_productos/components/user/user_list.dart';
 import '../../provider/user_provider.dart';
 
 class UserScreen extends StatefulWidget {
