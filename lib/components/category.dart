@@ -20,7 +20,6 @@ class CategoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Necesitas acceder al CategoryProvider para llamar a la función de eliminación
     final categoryProvider = context.read<CategoryProvider>();
 
     return ListView.builder(
@@ -28,82 +27,216 @@ class CategoryList extends StatelessWidget {
       itemCount: categories.length + (hasMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == categories.length) {
-          // ... (Mostrar CircularProgressIndicator para más categorías)
-          return const Padding(
-            padding: EdgeInsets.all(16),
-            child: Center(child: CircularProgressIndicator()),
-          );
+          return _buildLoadingIndicator();
         }
 
         final category = categories[index];
+        return _buildCategoryCard(context, category, categoryProvider);
+      },
+    );
+  }
 
-        // 💡 Usamos Dismissible para implementar el deslizamiento
-        return Dismissible(
-          // 1. **Key:** Obligatorio. Debe ser único para cada elemento.
-          key: ValueKey(category.id),
-          
-          // 2. **Background:** Lo que se muestra mientras se desliza.
-          background: Container(
-            color: Colors.red,
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 20.0),
-            child: const Icon(Icons.delete, color: Colors.white),
-          ),
-          
-          // 3. **Direction:** Permite deslizar solo hacia un lado (ej. de derecha a izquierda).
-          direction: DismissDirection.endToStart,
-          
-          // 4. **Confirmar Deslizamiento (Opcional pero Recomendado):** // Permite mostrar un diálogo de confirmación antes de eliminar.
-          confirmDismiss: (direction) async {
-            return await showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text("Confirmar"),
-                  content: Text("¿Estás seguro de que quieres eliminar la categoría ${category.nombre}?"),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false), // No eliminar
-                      child: const Text("CANCELAR"),
+  Widget _buildLoadingIndicator() {
+    return const Padding(
+      padding: EdgeInsets.all(16),
+      child: Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Widget _buildCategoryCard(BuildContext context, Category category, CategoryProvider categoryProvider) {
+    return Dismissible(
+      key: ValueKey(category.id),
+      direction: DismissDirection.endToStart,
+      background: _buildDismissibleBackground(),
+      secondaryBackground: _buildDismissibleSecondaryBackground(),
+      confirmDismiss: (direction) => _showDeleteConfirmationDialog(context, category),
+      onDismissed: (direction) => _handleCategoryDelete(context, category, categoryProvider),
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header con nombre de categoría
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      category.nombre,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true), // Eliminar
-                      child: const Text("ELIMINAR", style: TextStyle(color: Colors.red)),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          
-          // 5. **On Dismissed:** La acción a ejecutar una vez que se desliza y se confirma.
-          onDismissed: (direction) {
-            // Llama al método de tu CategoryProvider para eliminar la categoría
-            categoryProvider.deleteCategory(category.id);
-            categoryProvider.resetCategories();
-            categoryProvider.fetchCategories();
-            
-            // Opcional: Mostrar un SnackBar para indicar que se ha eliminado o para deshacer la acción.
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Categoría ${category.nombre} eliminada')),
-            );
-          },
-          
-          // 6. **Child:** El widget que se puede deslizar.
-          child: ListTile(
-            title: Text(category.nombre),
-            subtitle: Text("ID: ${category.id}"),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              Navigator.push(
+                  ),
+                  // _buildCategoryStatusBadge(category),
+                ],
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Información de la categoría
+              _buildCategoryInfoRow(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => EditCategoryScreen(id: category.id, name: category.nombre)),
-              );
-            },
+                Icons.fingerprint_outlined,
+                'ID de categoría',
+                category.id.toString(),
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Botones de acción
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditCategoryScreen(
+                            id: category.id, 
+                            name: category.nombre
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.edit_outlined, size: 16),
+                    label: const Text('Editar'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
+                  )
+                ],
+              ),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDismissibleBackground() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.green,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.only(left: 20.0),
+      child: const Row(
+        children: [
+          Icon(Icons.edit, color: Colors.white),
+          SizedBox(width: 8),
+          Text(
+            'Editar',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDismissibleSecondaryBackground() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.red,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.only(right: 20.0),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text(
+            'Eliminar',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(width: 8),
+          Icon(Icons.delete, color: Colors.white),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryInfoRow(BuildContext context, IconData icon, String title, String value) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: Colors.grey[600],
+          size: 20,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<bool?> _showDeleteConfirmationDialog(BuildContext context, Category category) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Eliminar Categoría"),
+          content: Text(
+            "¿Estás seguro de que quieres eliminar la categoría \"${category.nombre}\"?",
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text("CANCELAR"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text(
+                "ELIMINAR",
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
         );
       },
+    );
+  }
+
+  void _handleCategoryDelete(BuildContext context, Category category, CategoryProvider categoryProvider) {
+    categoryProvider.deleteCategory(category.id);
+    categoryProvider.resetCategories();
+    categoryProvider.fetchCategories();
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Categoría "${category.nombre}" eliminada'),
+      ),
     );
   }
 }

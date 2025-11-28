@@ -47,11 +47,11 @@ class RoleBadge extends StatelessWidget {
   String _formatRole(String role) {
     switch (role) {
       case 'admin_tienda':
-        return 'Administrador de Tienda';
+        return 'Administrador';
       case 'admin_tienda_secundario':
-        return 'Administrador Secundario';
+        return 'Supervisor';
       case 'empleado_tienda':
-        return 'Empleado de Tienda';
+        return 'Empleado';
       default:
         return role;
     }

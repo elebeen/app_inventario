@@ -4,8 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:registro_productos/components/app_bar.dart';
 import 'package:registro_productos/provider/product_provider.dart';
 import 'package:registro_productos/screens/products/add_product.dart';
-import 'package:provider/provider.dart';
-import 'package:registro_productos/provider/product_provider.dart';
 import 'package:registro_productos/screens/products/product_detail_screen.dart';
 
 class ScanProductScreen extends StatefulWidget {

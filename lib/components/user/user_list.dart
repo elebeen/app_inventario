@@ -61,7 +61,7 @@ class UserList extends StatelessWidget {
                 Expanded(
                   child: Text(
                     userName,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -117,42 +117,29 @@ class UserList extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      RoleBadge(role: user.roles.isNotEmpty ? user.roles[0].toString() : ''),
+                      RoleBadge(role: user.roles.isNotEmpty ? user.roles[0].nombre : ''),
                     ],
                   ),
                 ),
-              ],
-            ),
-            
-            const SizedBox(height: 8),
-            
-            // ID del usuario
-            InfoRow(
-              icon: Icons.fingerprint_outlined,
-              title: 'ID de usuario',
-              value: "ID: ${user.id}",
-            ),
-            
-            const SizedBox(height: 12),
-            
-            // Botón de acción
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => UserDetailScreen(user: user)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserDetailScreen(user: user)
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.visibility_outlined, size: 16),
+                    label: const Text('Ver detalles'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     ),
-                  );
-                },
-                icon: const Icon(Icons.visibility_outlined, size: 16),
-                label: const Text('Ver detalles'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
                 ),
-              ),
+              ],
             ),
           ],
         ),
