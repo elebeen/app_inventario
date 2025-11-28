@@ -238,4 +238,35 @@ class ProductProvider extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
+
+  /// Busca un producto por código de barras.
+  /// Retorna [true] si el producto existe y lo guarda en [_currentProduct].
+  /// Retorna [false] si no se encuentra o hay un error.
+  Future<dynamic> scanProduct(String codigoBarras) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // Llamamos a la función del repositorio
+      final product = await _productRepository.fetchProductByBarcode(codigoBarras);
+      
+      // Si la petición es exitosa, guardamos el producto encontrado
+      // para que la UI pueda mostrar sus datos si es necesario.
+      _currentProduct = product;
+      
+      _isLoading = false;
+      notifyListeners();
+      return product; // El producto existe
+    } catch (e) {
+      // Si ocurre un error (ej. 404 Not Found desde la API), asumimos que no existe
+      _currentProduct = null;
+      // Opcional: puedes guardar el error en _errorMessage si quieres mostrar por qué falló
+      // _errorMessage = e.toString(); 
+      
+      _isLoading = false;
+      notifyListeners();
+      return false; 
+    }
+  }
 }
