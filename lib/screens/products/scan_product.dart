@@ -64,9 +64,6 @@ class _ScanProductScreenState extends State<ScanProductScreen> {
                 ),
               );
             }
-
-            // Nota: El isProcessing se restablecerá si el usuario vuelve a esta pantalla 
-            // y se vuelve a montar el widget (se llama a initState o se presiona back).
           },
         ),
       ),

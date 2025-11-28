@@ -77,7 +77,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<bool> validateToken() async {
     try {
-      final response = await _api.get('/auth/refresh-token');
+      final response = await _api.post('/auth/refresh-token', {});
       if (response.statusCode == 200) {
         return true;
       } else {

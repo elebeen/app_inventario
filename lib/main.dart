@@ -101,10 +101,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       navigatorKey: navigatorKey,
       title: 'ScanShop',
-      home: auth.isAuthenticated ? const HomeScreen() : const LoginScreen(),
+      home: auth.isAuthenticated ? HomeScreen() : const LoginScreen(),
       routes: {
         '/login': (_) => const LoginScreen(),
-        '/home': (_) => const HomeScreen(),
+        '/home': (_) => HomeScreen(),
       },
     );
   }

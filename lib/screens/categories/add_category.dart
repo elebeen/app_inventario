@@ -90,11 +90,6 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
     Navigator.pop(context);
   }
 
-  void _clearForm() {
-    _categoriaCtrl.clear();
-    FocusScope.of(context).requestFocus(_categoryFocusNode);
-  }
-
   @override
   void dispose() {
     _categoriaCtrl.dispose();

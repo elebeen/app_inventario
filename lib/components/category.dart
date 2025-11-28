@@ -206,9 +206,18 @@ class CategoryList extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Eliminar Categoría"),
-          content: Text(
-            "¿Estás seguro de que quieres eliminar la categoría \"${category.nombre}\"?",
-            style: Theme.of(context).textTheme.bodyMedium,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "¿Estás seguro de que quieres eliminar la categoría \"${category.nombre}\"?",
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              Text(
+                "Se eliminarán todos los productos de esta categoría.", 
+                style: Theme.of(context).textTheme.bodyLarge
+              ),
+            ],
           ),
           actions: [
             TextButton(

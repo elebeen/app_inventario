@@ -1,7 +1,7 @@
 import 'package:registro_productos/data/models/product_model.dart';
 
 // para solo obtener las categorías sin productos
-class Category {
+class   Category {
   final int id;
   final String nombre;
   final int tiendaId;

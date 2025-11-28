@@ -25,6 +25,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   bool _controllersInitialized = false;
   late ProductProvider _productProvider;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -35,45 +36,28 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _priceController = TextEditingController();
     _stockController = TextEditingController();
 
-    // 1. Deferir la carga de datos de forma segura al siguiente frame
+    _productProvider = Provider.of<ProductProvider>(context, listen: false);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
-      final productProvider = Provider.of<ProductProvider>(context, listen: false);
       final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
 
-      // Iniciar la carga de categorías
       categoryProvider.fetchCategories();
 
-      // Iniciar la carga del producto
       if (widget.id != null) {
-        productProvider.fetchProduct(widget.id!);
+        _productProvider.fetchProduct(widget.id!);
       }
     });
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _productProvider = Provider.of<ProductProvider>(context, listen: false);
-    
-    // Inicializar controladores aquí, no en build()
-    if (!_controllersInitialized && _productProvider.currentProduct != null) {
-      _initializeControllers(_productProvider.currentProduct!);
-    }
-  }
-
-  // Función para inicializar los controladores con los datos del producto
   void _initializeControllers(Product product) {
-    // Solo inicializa la primera vez
     if (_controllersInitialized) return;
 
     _barcodeController.text = product.codigoBarras ?? '';
     _nameController.text = product.nombre ?? '';
-    // Usamos el formato toString() para los números
-    _priceController.text = product.precio?.toString() ?? '';
+    _priceController.text = product.precio?.toStringAsFixed(2) ?? '';
     _stockController.text = product.stock?.toString() ?? '';
-    // Si la categoría del producto es nula, no inicializamos _selectedCategoryId
     _selectedCategoryId = product.categoria?.id;
 
     _controllersInitialized = true;
@@ -85,7 +69,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _nameController.dispose();
     _priceController.dispose();
     _stockController.dispose();
-    // Limpiar el producto actual al salir de la pantalla
     _productProvider.clearCurrentProduct();
     super.dispose();
   }
@@ -95,47 +78,232 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     final categoryId = _selectedCategoryId;
     if (categoryId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecciona una categoría')),
-      );
+      _showErrorSnackBar('Selecciona una categoría');
       return;
     }
 
-    final productProvider = Provider.of<ProductProvider>(context, listen: false);
+    setState(() {
+      _isSaving = true;
+    });
 
-    final int id = widget.id!;
-    final String nombre = _nameController.text;
-    final double precio = double.tryParse(_priceController.text) ?? 0.0;
-    final int stock = int.tryParse(_stockController.text) ?? 0;
+    try {
+      final productProvider = _productProvider;
 
-    await productProvider.updateProduct(
-      id,
-      nombre,
-      precio,
-      stock,
-      categoryId,
-    );
+      final int id = widget.id!;
+      final String nombre = _nameController.text;
+      final double precio = double.tryParse(_priceController.text) ?? 0.0;
+      final int stock = int.tryParse(_stockController.text) ?? 0;
 
-    if (!mounted) return;
-
-    if (productProvider.errorMessage == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Producto $nombre actualizado.')),
+      await productProvider.updateProduct(
+        id,
+        nombre,
+        precio,
+        stock,
+        categoryId,
       );
-      
-      // Solo resetear la paginación, no limpiar la lista de productos
-      productProvider.resetPagination();
-      productProvider.clearLoading();
-      
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al actualizar: ${productProvider.errorMessage}'),
-          backgroundColor: Colors.red,
-        ),
-      );
+
+      if (!mounted) return;
+
+      if (productProvider.errorMessage == null) {
+        _showSuccessSnackBar('Producto "$nombre" actualizado correctamente');
+        
+        productProvider.resetPagination();
+        productProvider.clearLoading();
+        
+        Navigator.pop(context, true); // Retornar true indicando éxito
+      } else {
+        _showErrorSnackBar('Error al actualizar: ${productProvider.errorMessage}');
+      }
+    } catch (error) {
+      _showErrorSnackBar('Error inesperado: $error');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
     }
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.green.shade100),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: Colors.green.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.red.shade100),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: Colors.red.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  Widget _buildFormField({
+    required TextEditingController controller,
+    required String label,
+    required String? Function(String?) validator,
+    bool readOnly = false,
+    TextInputType? keyboardType,
+    IconData? prefixIcon,
+    String? hintText,
+    int? maxLines = 1,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: TextFormField(
+        controller: controller,
+        readOnly: readOnly,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hintText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade400),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade400),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.blue.shade600, width: 2),
+          ),
+          filled: true,
+          fillColor: readOnly ? Colors.grey.shade50 : Colors.white,
+          prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+        validator: validator,
+      ),
+    );
+  }
+
+  Widget _buildCategoryDropdown(CategoryProvider categoryProvider) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: DropdownButtonFormField<int>(
+        initialValue: _selectedCategoryId,
+        decoration: InputDecoration(
+          labelText: 'Categoría',
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade400),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade400),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.blue.shade600, width: 2),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          prefixIcon: Icon(Icons.category, size: 20, color: Colors.grey.shade600),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        ),
+        items: categoryProvider.categories.map((cat) {
+          return DropdownMenuItem<int>(
+            value: cat.id,
+            child: Text(
+              cat.nombre,
+              style: TextStyle(
+                color: _selectedCategoryId == cat.id ? Colors.blue.shade600 : Colors.grey.shade800,
+                fontWeight: _selectedCategoryId == cat.id ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          );
+        }).toList(),
+        onChanged: (v) => setState(() => _selectedCategoryId = v),
+        validator: (v) => v == null ? 'Selecciona una categoría' : null,
+        dropdownColor: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        icon: Icon(Icons.arrow_drop_down, color: Colors.grey.shade600),
+      ),
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return Container(
+      margin: const EdgeInsets.only(top: 8, bottom: 20),
+      child: ElevatedButton(
+        onPressed: _isSaving ? null : _saveProduct,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue.shade600,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 2,
+          shadowColor: Colors.blue.shade200,
+        ),
+        child: _isSaving
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.save, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    "GUARDAR CAMBIOS",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.blue.shade100),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.edit, color: Colors.blue.shade600, size: 24),
+          const SizedBox(width: 12),
+        ],
+      ),
+    );
   }
 
   @override
@@ -145,24 +313,65 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     final initialProduct = productProvider.currentProduct;
 
-    // Lógica para mostrar la carga y errores
+    if (!_controllersInitialized && initialProduct != null) {
+      _initializeControllers(initialProduct);
+    }
     if (productProvider.isLoading && initialProduct == null) {
-      return const Scaffold(
+      return Scaffold(
         appBar: CustomAppBar(title: "Cargando..."),
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Cargando producto...",
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     }
 
     if (initialProduct == null || widget.id == null) {
       return Scaffold(
         appBar: CustomAppBar(title: "Error"),
-        body: Center(child: Text(
-            productProvider.errorMessage ?? "No se encontraron datos para el ID: ${widget.id}"
-        )),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 64, color: Colors.red.shade400),
+              const SizedBox(height: 16),
+              Text(
+                productProvider.errorMessage ?? "No se encontraron datos para el ID: ${widget.id}",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: () => Navigator.pop(context),
+                icon: Icon(Icons.arrow_back),
+                label: Text("Volver"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey.shade600,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     }
 
-    // Manejar errores o carga de categorías de forma más integrada
     final isCategoryDataReady = !categoryProvider.isLoading && categoryProvider.errorMessage == null;
 
     if (!isCategoryDataReady) {
@@ -172,10 +381,25 @@ class _EditProductScreenState extends State<EditProductScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (categoryProvider.isLoading)
-                const CircularProgressIndicator(),
-              if (categoryProvider.errorMessage != null)
-                Text("Error categorías: ${categoryProvider.errorMessage}", style: const TextStyle(color: Colors.red)),
+              if (categoryProvider.isLoading) ...[
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Cargando categorías...",
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
+              ],
+              if (categoryProvider.errorMessage != null) ...[
+                Icon(Icons.error_outline, size: 48, color: Colors.red.shade400),
+                const SizedBox(height: 16),
+                Text(
+                  "Error: ${categoryProvider.errorMessage}",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.red.shade600),
+                ),
+              ],
             ],
           ),
         ),
@@ -183,89 +407,63 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
 
     return Scaffold(
-      appBar: CustomAppBar(title: "Editar ${initialProduct.nombre}"),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      appBar: CustomAppBar(
+        title: "Editar Producto",
+      ),
+      body: Container(
+        color: Colors.grey.shade50,
         child: Form(
           key: _formKey,
           child: ListView(
+            padding: const EdgeInsets.all(16),
             children: [
-              TextFormField(
+              _buildHeader(),
+
+              _buildFormField(
                 controller: _barcodeController,
+                label: "Código de barras",
+                validator: (v) => null,
                 readOnly: true,
-                decoration: const InputDecoration(
-                  labelText: "Código de barras",
-                  border: OutlineInputBorder(),
-                ),
+                prefixIcon: Icons.qr_code,
               ),
-              const SizedBox(height: 12),
 
-              TextFormField(
+              _buildFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: "Nombre",
-                  border: OutlineInputBorder(),
-                ),
-                validator: (v) =>
-                (v == null || v.isEmpty) ? "Ingresa un nombre" : null,
-              ),
-              const SizedBox(height: 12),
-
-              TextFormField(
-                controller: _priceController,
-                decoration: const InputDecoration(
-                  labelText: "Precio",
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                validator: (v) =>
-                (v == null || v.isEmpty) ? "Ingresa un precio" : null,
-              ),
-              const SizedBox(height: 12),
-
-              TextFormField(
-                controller: _stockController,
-                decoration: const InputDecoration(
-                  labelText: "Stock",
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (v) =>
-                (v == null || v.isEmpty) ? "Ingresa el stock" : null,
+                label: "Nombre del producto",
+                validator: (v) => (v == null || v.isEmpty) ? "Ingresa un nombre" : null,
+                prefixIcon: Icons.shopping_bag,
+                hintText: "Ej: Laptop Dell Inspiron 15",
               ),
 
-              const SizedBox(height: 20),
-
-              // Dropdown de categorías
-              DropdownButtonFormField<int>(
-                initialValue: _selectedCategoryId,
-                decoration: const InputDecoration(
-                  labelText: 'Categoría',
-                  border: OutlineInputBorder(),
-                ),
-                items: categoryProvider.categories.map((cat) {
-                  return DropdownMenuItem<int>(
-                    value: cat.id,
-                    child: Text(cat.nombre),
-                  );
-                }).toList(),
-                onChanged: (v) => setState(() => _selectedCategoryId = v),
-                validator: (v) => v == null ? 'Selecciona una categoría' : null,
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildFormField(
+                      controller: _priceController,
+                      label: "Precio",
+                      validator: (v) => (v == null || v.isEmpty) ? "Ingresa un precio" : null,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      prefixIcon: Icons.attach_money,
+                      hintText: "0.00",
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildFormField(
+                      controller: _stockController,
+                      label: "Stock",
+                      validator: (v) => (v == null || v.isEmpty) ? "Ingresa el stock" : null,
+                      keyboardType: TextInputType.number,
+                      prefixIcon: Icons.inventory_2,
+                      hintText: "0",
+                    ),
+                  ),
+                ],
               ),
 
-              const SizedBox(height: 20),
+              _buildCategoryDropdown(categoryProvider),
 
-              // Botón de guardar
-              ElevatedButton(
-                onPressed: productProvider.isLoading ? null : _saveProduct,
-                child: productProvider.isLoading
-                    ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-                    : const Text("Guardar Cambios"),
-              ),
+              _buildSaveButton(),
             ],
           ),
         ),
