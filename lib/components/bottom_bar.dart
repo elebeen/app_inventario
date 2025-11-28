@@ -42,8 +42,8 @@ class CustomBottomBar extends StatelessWidget {
             label: 'Usuarios',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.account_circle_outlined),
+            label: 'Account',
           ),
         ] else ...[
           BottomNavigationBarItem(
@@ -53,6 +53,10 @@ class CustomBottomBar extends StatelessWidget {
           BottomNavigationBarItem(
             icon: Icon(Icons.category),
             label: 'Categorías',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle_outlined),
+            label: 'Account',
           ),
         ],
       ],

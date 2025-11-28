@@ -155,7 +155,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     if (initialProduct == null || widget.id == null) {
       return Scaffold(
-        appBar: const CustomAppBar(title: "Error"),
+        appBar: CustomAppBar(title: "Error"),
         body: Center(child: Text(
             productProvider.errorMessage ?? "No se encontraron datos para el ID: ${widget.id}"
         )),

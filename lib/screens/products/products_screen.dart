@@ -48,7 +48,8 @@ class _ProductScreenState extends State<ProductScreen> {
   Widget build(BuildContext context) {
     final productProvider = context.watch<ProductProvider>();
 
-    Widget screenBody;
+    Widget screenBody = const SizedBox.shrink();
+
     if (productProvider.isLoading) {
       screenBody = const Center(child: CircularProgressIndicator());
     } else if (productProvider.errorMessage != null) {

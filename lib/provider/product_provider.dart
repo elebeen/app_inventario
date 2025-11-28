@@ -200,6 +200,28 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
+  Future<Product?> scanProduct(String barcode) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    
+    try {
+      final product = await _productRepository.scanProducts(barcode);
+      _currentProduct = product;
+      _isLoading = false;
+      notifyListeners();
+
+      return product;
+    } catch (e) {
+      _currentProduct = null;
+      _errorMessage = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return null;
+  }
+
   void resetPagination() {
     _hasMore = true;
     _page = 1;
