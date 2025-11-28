@@ -1,45 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:registro_productos/components/app_bar.dart';
 import 'package:registro_productos/provider/category_provider.dart';
+import 'package:registro_productos/components/app_bar.dart';
 
-class EditCategoryScreen extends StatefulWidget {
-  final int? id;
-  final String? name;
-  const EditCategoryScreen({super.key, this.id, this.name});
+class CreateCategoryScreen extends StatefulWidget {
+  const CreateCategoryScreen({super.key});
 
   @override
-  State<EditCategoryScreen> createState() => _EditCategoryScreenState();
+  State<CreateCategoryScreen> createState() => _CreateCategoryScreenState();
 }
 
-class _EditCategoryScreenState extends State<EditCategoryScreen> {
+class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _categoriaCtrl = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _categoriaCtrl.text = widget.name ?? '';
-
-    // Llamar a la API una sola vez
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-
-      Provider.of<CategoryProvider>(context, listen: false);
-    });
-  }
-
-  Future<void> updateCategory() async {
+  Future<void> guardarCategoria() async {
     if (!_formKey.currentState!.validate()) return;
 
     final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
-    await categoryProvider.updateCategory(widget.id!, _categoriaCtrl.text);
+    await categoryProvider.createCategory(_categoriaCtrl.text);
 
     if (!mounted) return;
 
     if (categoryProvider.errorMessage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Categoría actualizada')),
+        const SnackBar(content: Text('Categoría creada')),
       );
 
       Navigator.pop(context);
@@ -63,17 +48,10 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final categoryProvider = context.watch<CategoryProvider>();
-
-    if (categoryProvider.isLoading) {
-      return Scaffold(
-        appBar: CustomAppBar(title: "Cargando..."),
-        body: Center(child: const CircularProgressIndicator()),
-      );
-    }
+    final category = context.watch<CategoryProvider>();
 
     return Scaffold(
-      appBar: CustomAppBar(title: "Editar Categoría"),
+      appBar: CustomAppBar(title: 'Agregar Categoría'),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -90,14 +68,14 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: categoryProvider.isLoading ? null : updateCategory,
-                child: categoryProvider.isLoading ? 
+                onPressed: category.isLoading ? null : guardarCategoria,
+                child: category.isLoading ? 
                   const CircularProgressIndicator() : 
                   const Text('Guardar'),
               ),
-              if (categoryProvider.errorMessage != null)
+              if (category.errorMessage != null)
                 Text(
-                  categoryProvider.errorMessage!,
+                  category.errorMessage!,
                   style: const TextStyle(color: Colors.red),
                 ),
             ],

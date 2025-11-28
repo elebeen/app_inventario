@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:registro_productos/components/app_bar.dart';
 import 'package:registro_productos/provider/product_provider.dart';
 import 'package:registro_productos/screens/products/add_product.dart';
+import 'package:provider/provider.dart';
+import 'package:registro_productos/provider/product_provider.dart';
 import 'package:registro_productos/screens/products/product_detail_screen.dart';
 
 class ScanProductScreen extends StatefulWidget {
@@ -14,8 +16,14 @@ class ScanProductScreen extends StatefulWidget {
 }
 
 class _ScanProductScreenState extends State<ScanProductScreen> {
-  // Bandera para evitar múltiples detecciones rápidas
+  bool scanned = false;
   bool _isProcessing = false; 
+
+  @override
+  void dispose() {
+    scanned = false;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,39 +34,31 @@ class _ScanProductScreenState extends State<ScanProductScreen> {
       appBar: CustomAppBar(title: "Escanear producto"),
       body: SizedBox.expand(
         child: MobileScanner(
-          fit: BoxFit.cover,
+          fit: BoxFit.cover, // ← opcional para que llene el espacio
           onDetect: (capture) async {
-            // Detenemos la ejecución si ya estamos procesando
             if (_isProcessing) return;
-            
+
             final barcode = capture.barcodes.first;
             final code = barcode.rawValue;
 
             if (code == null) return;
-            
-            // 1. Bloquear el escáner
+
             setState(() {
               _isProcessing = true;
             });
 
-            // 2. Obtener el Provider
             final api = Provider.of<ProductProvider>(context, listen: false);
 
-            // 3. Llamar a la función que retorna el booleano
             final dynamic exists = await api.scanProduct(code);
-            
-            // 4. Redirección condicional
-            if (exists) {
-              // Producto encontrado: Redirigir a la pantalla de detalles/edición
-              // El producto ya está en productProvider.currentProduct
+
+            if (exists != null) {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => ProductDetailScreen(product: exists,), // Muestra el producto
+                  builder: (context) => ProductDetailScreen(product: exists),
                 ),
               );
             } else {
-              // Producto NO encontrado: Redirigir a la pantalla de adición
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(

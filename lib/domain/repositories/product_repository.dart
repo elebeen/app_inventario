@@ -8,7 +8,7 @@ abstract class ProductRepository {
   Future<Product> updateProduct(int id, String nombre, double precio, int stock, int categoria);
   Future<Product> updateStock(int id, int stock);
   Future<void> deleteProduct(int id);
-  Future<Product> fetchProductByBarcode(String codigoBarras);
+  Future<Product> scanProducts(String barcode);
 }
 
 class ProductRepositoryImpl implements ProductRepository {
@@ -75,9 +75,9 @@ class ProductRepositoryImpl implements ProductRepository {
   }
   
   @override
-  Future<Product> fetchProductByBarcode(String codigoBarras) async {
-    final response = await _api.post('/productos/scan/', {
-      'codigo_barras': codigoBarras,
+  Future<Product> scanProducts(String barcode) async {
+    final response = await _api.post('/productos/scan', {
+      'codigo_barras': barcode
     });
 
     return Product.fromJson(response.data);

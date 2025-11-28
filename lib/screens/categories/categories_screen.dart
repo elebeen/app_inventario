@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:registro_productos/components/category.dart';
 import 'package:registro_productos/provider/category_provider.dart';
+import 'package:registro_productos/screens/categories/add_category.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -45,46 +46,36 @@ class _CategoryScreenState extends State<CategoryScreen> {
   Widget build(BuildContext context) {
     final categoryProvider = context.watch<CategoryProvider>();
 
-    if (categoryProvider.isLoading && categoryProvider.categories.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    Widget screenBody = const SizedBox.shrink();
 
-    if (categoryProvider.errorMessage != null) {
-      return Center(child: Text("Error: ${categoryProvider.errorMessage}"));
-    }
-
-    if (categoryProvider.categories.isEmpty) {
-      return const Center(child: Text("No se encontraron categorias."));
-    }
-
-    if (categoryProvider.errorMessage != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Error: ${categoryProvider.errorMessage}"),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                categoryProvider.clearError();
-                categoryProvider.fetchCategories();
-              },
-              child: const Text("Reintentar"),
-            ),
-          ],
-        ),
+    if (categoryProvider.isLoading) {
+      screenBody = const Center(child: CircularProgressIndicator());
+    } else if (categoryProvider.errorMessage != null) {
+      screenBody = Center(child: Text("Error: ${categoryProvider.errorMessage}"));
+    } else if (categoryProvider.categories.isEmpty) {
+      screenBody = const Center(child: Text("No se encontraron categorias."));
+    } else {
+      screenBody = CategoryList(
+        categoryProvider.categories,
+        _scrollController,
+        categoryProvider.hasMoreCategories,
+        categoryProvider.isLoading,
       );
     }
 
-    if (categoryProvider.categories.isEmpty && !categoryProvider.isLoading) {
-      return const Center(child: Text("No se encontraron categorías."));
-    }
-
-    return CategoryList(
-      categoryProvider.categories,
-      _scrollController,
-      categoryProvider.hasMoreCategories,
-      categoryProvider.isLoading,
+    return Scaffold(
+      body: screenBody,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blueAccent,
+        child: const Icon(Icons.add),
+        onPressed: () async {
+          // 1. Esperamos a que la pantalla de Scan/Añadir se cierre
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const CreateCategoryScreen()),
+          );
+        },
+      ),
     );
   }
 }

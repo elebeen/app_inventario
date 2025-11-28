@@ -5,8 +5,8 @@ abstract class CategoryRepository {
   Future<PaginatedCategoryResponse> getCategories(int page, int size);
   Future<CategoryWithProductsResponse> getCategory(int id, int page, int size);
   Future<void> createCategory(String category);
-  Future<void> updateCategory(String id, String category);
-  Future<void> deleteCategory(String id);
+  Future<void> updateCategory(int id, String category);
+  Future<void> deleteCategory(int id);
 }
 
 class CategoryRepositoryImpl implements CategoryRepository {
@@ -43,13 +43,13 @@ class CategoryRepositoryImpl implements CategoryRepository {
   }
   
   @override
-  Future<void> updateCategory(String id, String category) async {
+  Future<void> updateCategory(int id, String category) async {
     final response = await _api.put('/categorias/$id', {'nombre': category});
     return response.data;
   }
 
   @override
-  Future<void> deleteCategory(String id) async {
+  Future<void> deleteCategory(int id) async {
     final response = await _api.delete('/categorias/$id');
     return response.data;
   }

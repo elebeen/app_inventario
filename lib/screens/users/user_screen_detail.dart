@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:registro_productos/components/app_bar.dart';
-import 'package:registro_productos/components/user_info.dart';
+import 'package:registro_productos/components/user/user_info.dart';
 import 'package:registro_productos/data/models/user_model.dart';
 
 class UserDetailScreen extends StatelessWidget {
