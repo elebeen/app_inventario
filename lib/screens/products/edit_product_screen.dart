@@ -288,24 +288,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 24),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.shade100),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.edit, color: Colors.blue.shade600, size: 24),
-          const SizedBox(width: 12),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final categoryProvider = context.watch<CategoryProvider>();
@@ -417,7 +399,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              _buildHeader(),
 
               _buildFormField(
                 controller: _barcodeController,

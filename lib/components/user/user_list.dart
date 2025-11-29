@@ -121,24 +121,25 @@ class UserList extends StatelessWidget {
                     ],
                   ),
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UserDetailScreen(user: user)
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.visibility_outlined, size: 16),
-                    label: const Text('Ver detalles'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    ),
-                  ),
-                ),
+                //se hara si se necesita
+                // Align(
+                //   alignment: Alignment.centerRight,
+                //   child: ElevatedButton.icon(
+                //     onPressed: () {
+                //       Navigator.push(
+                //         context,
+                //         MaterialPageRoute(
+                //           builder: (context) => UserDetailScreen(user: user)
+                //         ),
+                //       );
+                //     },
+                //     icon: const Icon(Icons.edit, size: 16),
+                //     label: const Text('Editar'),
+                //     style: ElevatedButton.styleFrom(
+                //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ],

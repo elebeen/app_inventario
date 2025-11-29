@@ -271,6 +271,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
       body: Column(
         children: [
+          Container(
+            padding: const EdgeInsets.only(top: 16, bottom: 16),
+            child: Icon( 
+              Icons.shopping_basket_sharp,
+              size: 100,
+              color: Colors.grey.shade400,
+            ),
+          ),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),

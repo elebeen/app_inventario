@@ -39,7 +39,7 @@ class ProductInfo extends StatelessWidget {
           Text(
             product.nombre?? '',
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 30,
               fontWeight: FontWeight.bold,
               color: Colors.blueGrey,
             ),

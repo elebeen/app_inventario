@@ -57,6 +57,8 @@ class _ScanProductScreenState extends State<ScanProductScreen> {
                 ),
               );
             } else {
+              api.clearError();
+              
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
